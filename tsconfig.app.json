@@ -9,6 +9,8 @@
   ],
   "exclude": [
     "src/test.ts",
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "src/app/admin/admin.module.ts",
+    "src/app/customer/customer.module.ts"
   ]
 }

@@ -1,0 +1,50 @@
+[
+{
+    "id": 1,
+    "name": "Curtain Set - Blackout (Beige)",
+    "price": 1200,
+    "imageUrl": "/assets/images/6.jpg",
+    "images": [
+      "/assets/images/5.jpg",
+      "/assets/images/2.jpg"
+    ],
+    "category": "Curtains",
+    "description": "Premium blackout curtains with thermal insulation. 4x7 ft pair."
+  },
+{
+    "id": 2,
+    "name": "Curtain Set - Sheer (White)",
+    "price": 850,
+    "imageUrl": "/assets/images/5.jpg",
+    "images": [
+      "/assets/images/6.jpg",
+      "/assets/images/1.jpg"
+    ],
+    "category": "Curtains",
+    "description": "Elegant sheer curtains allowing natural light. 4x7 ft pair."
+  },
+{
+    "id": 3,
+    "name": "Electric Kettle 1.8L",
+    "price": 1499,
+    "imageUrl": "/assets/images/6.jpg",
+    "images": [
+      "/assets/images/7.jpg",
+      "/assets/images/3.jpg"
+    ],
+    "category": "Appliances",
+    "description": "Stainless steel body, auto cutoff, 1500W fast boiling."
+  },
+{
+    "id": 4,
+    "name": "Air Fryer 4L",
+    "price": 5599,
+    "imageUrl": "/assets/images/7.jpg",
+    "images": [
+      "/assets/images/5.jpg",
+      "/assets/images/4.jpg"
+    ],
+    "category": "Appliances",
+    "description": "Healthy frying with 85% less oil. Digital controls and timer."
+  }
+]

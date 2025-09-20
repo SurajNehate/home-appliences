@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './material.module';
 import { ToastrModule } from 'ngx-toastr';
 import { HomeComponent } from './home/home.component';
 
@@ -14,12 +15,18 @@ import { HomeComponent } from './home/home.component';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { AdminModule } from './admin/admin.module';
-import { CustomerModule } from './customer/customer.module';
-import { ProductCrudComponent } from './product/product-crud/product-crud.component';
+// Removed AdminModule/CustomerModule and legacy ProductCrudComponent for a simplified storefront
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { ContactUsComponent } from './contact-us/contact-us.component';
+import { ProductListComponent } from './catalog/product-list/product-list.component';
+import { ProductDetailComponent } from './catalog/product-detail/product-detail.component';
+import { CartComponent } from './cart/cart.component';
+import { CheckoutGuestComponent } from './checkout-guest/checkout-guest.component';
+import { CatalogAdminComponent } from './admin/catalog-admin/catalog-admin.component';
+import { AdminLoginComponent } from './admin/admin-login/admin-login.component';
+import { SigninSignupComponent } from './customer/signin-signup/signin-signup.component';
+import { UsersAdminComponent } from './admin/users-admin/users-admin.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -29,21 +36,29 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     HomeComponent,
-    ProductCrudComponent,
     UserProfileComponent,
-    ContactUsComponent
+    ContactUsComponent,
+    ProductListComponent,
+    ProductDetailComponent,
+    CartComponent,
+    CheckoutGuestComponent,
+    CatalogAdminComponent,
+    AdminLoginComponent,
+    SigninSignupComponent,
+    UsersAdminComponent
   ],
   imports: [
     CommonModule,
     SharedModule,
     FormsModule,
     ReactiveFormsModule,
-    AdminModule,
-    CustomerModule,
+    // AdminModule,
+    // CustomerModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule, // required animations module
+    MaterialModule,
     ToastrModule.forRoot(), // ToastrModule added
     TranslateModule.forRoot({
       loader: {

@@ -37,7 +37,6 @@ export class Product {
 export class Order {
     id: number;
     userId: number;
-    sellerId: number;
     product: Product;
     deliveryAddress: Address;
     contact: Number;

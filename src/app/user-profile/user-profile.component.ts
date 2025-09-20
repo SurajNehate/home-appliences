@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { User } from '../core/models/object-model';
 import { ToastrService } from 'ngx-toastr';
-import { UserService } from '../shared/services/user.service';
+import { UsersService, AdminUserRow } from '../shared/services/users.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -26,7 +26,7 @@ export class UserProfileComponent implements OnInit {
   user_role;
 
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private user_service: UserService, private toastr: ToastrService) { }
+  constructor(private formBuilder: FormBuilder, private router: Router, private usersService: UsersService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.user_id = Number(sessionStorage.getItem('user_session_id'));
@@ -52,48 +52,54 @@ export class UserProfileComponent implements OnInit {
   get rf() { return this.userProfileForm.controls; }
 
   editUserData(user_id) {
-    this.user_service.getUserData(user_id).subscribe(data => {
-      this.user_data = data;
-      this.user_profile_pic = this.user_data.uploadPhoto;
-      this.user_language = this.user_data.language;
-      this.user_role = this.user_data.role;
-      this.userProfileForm.setValue({
-        name: this.user_data.name,
-        mobNumber: this.user_data.mobNumber,
-        age: this.user_data.age,
-        dob: this.user_data.dob,
-        email: this.user_data.email,
-        password: this.user_data.password,
-        addLine1: this.user_data.address.addLine1,
-        addLine2: this.user_data.address.addLine2,
-        city: this.user_data.address.city,
-        state: this.user_data.address.state,
-        zipCode: this.user_data.address.zipCode,
-        gender: this.user_data.gender,
-        aboutYou: this.user_data.aboutYou,
-        uploadPhoto: '',
-      })
+    this.usersService.all().subscribe(users => {
+      this.user_data = users.find(u => u.id === user_id);
+      if (this.user_data) {
+        this.user_profile_pic = this.user_data.uploadPhoto;
+        this.user_language = this.user_data.language;
+        this.user_role = this.user_data.role;
+        this.userProfileForm.setValue({
+          name: this.user_data.name || '',
+          mobNumber: this.user_data.phone || '',
+          age: this.user_data.age || '',
+          dob: this.user_data.dob || '',
+          email: this.user_data.email || '',
+          password: this.user_data.password || '',
+          addLine1: (this.user_data.address && this.user_data.address.addLine1) || '',
+          addLine2: (this.user_data.address && this.user_data.address.addLine2) || '',
+          city: (this.user_data.address && this.user_data.address.city) || '',
+          state: (this.user_data.address && this.user_data.address.state) || '',
+          zipCode: (this.user_data.address && this.user_data.address.zipCode) || '',
+          gender: this.user_data.gender || '',
+          aboutYou: this.user_data.aboutYou || '',
+          uploadPhoto: '',
+        });
+      } else {
+        this.toastr.error('User not found', 'Profile Error');
+        this.router.navigateByUrl('/');
+      }
     }, error => {
-      console.log("My error", error);
-    })
+      console.log("Error loading user data", error);
+      this.toastr.error('Failed to load user data', 'Profile Error');
+    });
   }
 
   updateProfile() {
     this.userProfile = true;
     if (this.userProfileForm.invalid) {
-      this.toastr.error('Some Error Occured!', 'User Profile!');
-      // alert('Error!! :-)\n\n' + JSON.stringify(this.userProfileForm.value))
+      this.toastr.error('Please correct the errors in the form', 'User Profile!');
       return;
     }
     this.user_updated_data = this.userProfileForm.value;
-    this.user_dto = {
+    
+    const updates: Partial<AdminUserRow> = {
       name: this.user_updated_data.name,
-      mobNumber: this.user_updated_data.mobNumber,
+      phone: this.user_updated_data.mobNumber,
       age: this.user_updated_data.age,
       dob: this.user_updated_data.dob,
       email: this.user_updated_data.email,
       password: this.user_updated_data.password,
-      language: this.user_updated_data.language,
+      language: this.user_language,
       gender: this.user_updated_data.gender,
       address: {
         id: 0,
@@ -105,23 +111,18 @@ export class UserProfileComponent implements OnInit {
       },
       aboutYou: this.user_updated_data.aboutYou,
       uploadPhoto: (this.user_updated_data.uploadPhoto == "" ? this.user_profile_pic : this.user_updated_data.uploadPhoto),
-      agreetc: this.user_updated_data.agreetc,
-      role: this.user_role
-    }
-    this.user_service.updateUserData(this.user_id, this.user_dto).subscribe(data => {
-      this.toastr.success('Profile Updated Successfully!', 'User Profile!');
+      role: this.user_role as 'admin' | 'member'
+    };
+    
+    this.usersService.update(this.user_id, updates);
+    this.usersService.downloadJson('users.json');
+    this.toastr.success('Profile Updated Successfully! Downloaded users.json — replace src/assets/users.json to persist.', 'User Profile!');
 
-      if (this.user_role == 'admin') {
-        this.router.navigateByUrl('/admin-dashboard');
-      } else if (this.user_role == 'seller') {
-        this.router.navigateByUrl('/seller-dashboard');
-      } else if (this.user_role == 'buyer') {
-        this.router.navigateByUrl('/buyer-dashboard');
-      }
-    }, err => {
-      this.toastr.error('Some Error Occured!', 'User Profile!');
-      // alert("Some Error Occured");
-    })
+    if (this.user_role == 'admin') {
+      this.router.navigateByUrl('/admin/catalog');
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 
 }

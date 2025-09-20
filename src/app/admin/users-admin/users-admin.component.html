@@ -1,0 +1,62 @@
+<!-- Admin navigation is now in main header -->
+<div class="container mt-3">
+  <h2>Admin: Users</h2>
+  <p class="text-muted">Manage users list. Download updated users.json and replace <code>src/assets/users.json</code> in your repo.</p>
+
+  <div class="card mb-3">
+    <div class="card-header">Add New User</div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Name</label><input class="form-control" [(ngModel)]="newUser.name"></div>
+        <div class="form-group col-md-3"><label>Email</label><input class="form-control" [(ngModel)]="newUser.email"></div>
+        <div class="form-group col-md-2"><label>Password</label><input type="password" class="form-control" [(ngModel)]="newUser.password" placeholder="defaultpass123"></div>
+        <div class="form-group col-md-2"><label>Phone</label><input class="form-control" [(ngModel)]="newUser.phone"></div>
+        <div class="form-group col-md-2"><label>Role</label>
+          <select class="form-control" [(ngModel)]="newUser.role">
+            <option value="member">Member</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="addUser()">Add</button>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Users ({{users.length}})</span>
+      <div class="d-flex align-items-center">
+<select class="form-control form-control-sm mr-2" #sectionSel (change)="onSectionChange(sectionSel.value)">
+          <option value="users" selected>Users</option>
+          <option value="products">Products</option>
+        </select>
+        <input type="file" accept="application/json" (change)="onFileSelected($event)">
+        <button class="btn btn-sm btn-outline-secondary ml-2" (click)="applyEditor()">Apply Editor</button>
+        <button class="btn btn-sm btn-success ml-2" (click)="downloadJson()">Download JSON</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-sm table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Email</th><th>Password</th><th>Phone</th><th>Role</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>{{u.id}}</td>
+            <td>{{u.name}}</td>
+            <td>{{u.email}}</td>
+            <td>{{u.password}}</td>
+            <td>{{u.phone}}</td>
+            <td>{{u.role}}</td>
+            <td><button class="btn btn-sm btn-danger" (click)="deleteUser(u.id)">Delete</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <label>Raw JSON Editor</label>
+      <textarea class="form-control" rows="12" [(ngModel)]="editorText"></textarea>
+    </div>
+  </div>
+</div>

@@ -30,6 +30,7 @@
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/font-awesome/css/font-awesome.min.css",
               "node_modules/ngx-toastr/toastr.css",
+              "src/theme.scss",
               "src/styles.scss"
             ],
             "scripts": [
@@ -67,7 +68,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-ecommerce:build"
+            "browserTarget": "angular-ecommerce:build",
+            "ssl": true
           },
           "configurations": {
             "production": {

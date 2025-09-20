@@ -5,6 +5,17 @@
 export const environment = {
   production: false,
   server_url: "http://localhost:3000",
+  // Simple static admin login (for static site only). Change these in your local env before deploy.
+  adminLogin: {
+    username: 'admin@gmail.com',
+    password: '123456'
+  },
+  // Public contact info displayed on Contact page
+  contact: {
+    phone: '+91-1234567890',
+    email: 'personal@gmail.com',
+    whatsapp: 'https://wa.me/911234567890'
+  }
 };
 
 /*

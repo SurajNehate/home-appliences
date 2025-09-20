@@ -36,19 +36,16 @@ export class AdminAuthGaurdService {
   }
 }
 
-//Customer(Buyer & Seller) before login
+//Member before login
 @Injectable({
   providedIn: "root"
 })
-export class SellerBuyerAuthGuardLogin implements CanActivate {
+export class MemberAuthGuardLogin implements CanActivate {
   constructor(private router: Router) { }
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     let role = sessionStorage.getItem("role")
-    if (role == "seller") {
-      this.router.navigate(["/seller-dashboard"]);
-      return false;
-    } else if (role == "buyer") {
-      this.router.navigate(["/buyer-dashboard"]);
+    if (role == "member") {
+      this.router.navigate(["/"]);
       return false;
     } else {
       return true;
@@ -56,32 +53,15 @@ export class SellerBuyerAuthGuardLogin implements CanActivate {
   }
 }
 
-//Seller(Customer) after login
+//Member after login
 @Injectable({
   providedIn: 'root'
 })
-export class SellerAuthGaurdService {
+export class MemberAuthGaurdService {
   constructor(private router: Router) { }
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     let role = sessionStorage.getItem("role");
-    if (role == 'seller') {
-      return true;
-    } else {
-      this.router.navigate(["/sign-in"]);
-      return false;
-    }
-  }
-}
-
-//Buyer(Customer) after login
-@Injectable({
-  providedIn: 'root'
-})
-export class BuyerAuthGaurdService {
-  constructor(private router: Router) { }
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    let role = sessionStorage.getItem("role")
-    if (role == 'buyer') {
+    if (role == 'member') {
       return true;
     } else {
       this.router.navigate(["/sign-in"]);

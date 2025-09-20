@@ -6,6 +6,7 @@ import { PageNotFoundErrorComponent } from './layouts/page-not-found-error/page-
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 import { NumberOnlyDirective } from './directives/number-only.directive';
+import { MaterialModule } from '../material.module';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { NumberOnlyDirective } from './directives/number-only.directive';
   imports: [
     CommonModule,
     TranslateModule,
-    RouterModule
+    RouterModule,
+    MaterialModule
   ],
   exports: [
     HeaderComponent,

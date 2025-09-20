@@ -1,7 +1,7 @@
 {
     "intro": "Welcome to the world of Internationalization",
     "proj_name": "Electricals & Decors",
-    "project_short_desc": "This project is like ecommerce portal where some of the user(Seller) who want to sell the product and services using this and some of the user(Buyer/End User) who needs the product they can buy from the user(Seller). On top of this two user there is another user(Admin) we named as admin, who have control all the operation like, he/she can delete the product, buyer, seller, can edit and update also. ",
+"project_short_desc": "This project is a simple e-commerce portal. Members can browse and order products. An Admin can manage products and users.",
     "view_detail_doc_btn": "View Detailed Documentation",
     "header": {
         "ecommerce": "Home Decor",

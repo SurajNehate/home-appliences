@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms'
 import { RouterModule, Router } from '@angular/router';
 import { LoginSignupService } from '../../shared/services/login-signup.service';
 import { User } from '../../core/models/object-model';
+import { UsersService } from '../../shared/services/users.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-signin-signup',
@@ -22,7 +24,7 @@ export class SigninSignupComponent implements OnInit {
 
   signInFormValue: any = {};
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private logsign_service: LoginSignupService) { }
+  constructor(private formBuilder: FormBuilder, private router: Router, private logsign_service: LoginSignupService, private usersService: UsersService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.href = this.router.url;
@@ -31,6 +33,9 @@ export class SigninSignupComponent implements OnInit {
     } else if (this.href == '/sign-in') {
       this.regForm = false;
     }
+
+    // Ensure users.json is loaded before attempting sign-in
+    this.usersService.all().subscribe();
 
     this.signUpform = this.formBuilder.group({
       name: ['', Validators.required],
@@ -49,7 +54,6 @@ export class SigninSignupComponent implements OnInit {
       aboutYou: ['', Validators.required],
       uploadPhoto: ['', Validators.required],
       agreetc: ['', Validators.required],
-      role: ['', Validators.required],
 
     })
 
@@ -63,73 +67,58 @@ export class SigninSignupComponent implements OnInit {
   onSubmitSignUp() {
     this.signUpsubmitted = true;
     if (this.signUpform.invalid) {
-      // alert('Error!! :-)\n\n' + JSON.stringify(this.signUpform.value))
+      this.toastr.error('Please correct the errors in the form', 'Validation');
       return;
     }
-    // alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.signUpform.value))
-    // console.log(this.signUpform.value)
-    this.user_reg_data = this.signUpform.value;
-    this.user_dto = {
-      aboutYou: this.user_reg_data.aboutYou,
-      // addLine1: this.user_reg_data.addLine1,
-      // addLine2: this.user_reg_data.addLine2,
-      age: this.user_reg_data.age,
-      agreetc: this.user_reg_data.agreetc,
-      // city: this.user_reg_data.city,
-      dob: this.user_reg_data.dob,
-      email: this.user_reg_data.email,
-      gender: this.user_reg_data.gender,
+    const v = this.signUpform.value;
+    // Build user row for users.json with all captured fields
+    const newUser = {
+      name: v.name,
+      email: v.email,
+      password: v.password,
+      phone: v.mobNumber,
+      role: 'member',
+      age: v.age,
+      dob: v.dob,
+      language: v.language,
+      gender: v.gender,
+      aboutYou: v.aboutYou,
+      uploadPhoto: v.uploadPhoto,
+      agreetc: !!v.agreetc,
       address: {
         id: 0,
-        addLine1: this.user_reg_data.addLine1,
-        addLine2: this.user_reg_data.addLine2,
-        city: this.user_reg_data.city,
-        state: this.user_reg_data.state,
-        zipCode: this.user_reg_data.zipCode,
-      },
-      language: this.user_reg_data.language,
-      mobNumber: this.user_reg_data.mobNumber,
-      name: this.user_reg_data.name,
-      password: this.user_reg_data.password,
-      // state: this.user_reg_data.state,
-      uploadPhoto: this.user_reg_data.uploadPhoto,
-      // zipCode: this.user_reg_data.zipCode,
-      role: this.user_reg_data.role
-    }
-    this.logsign_service.userRegister(this.user_dto).subscribe(data => {
-      // console.log(data);
-      alert("Success");
-      this.router.navigateByUrl('/sign-in');
-    }, err => {
-      alert("Some Error Occured");
-    })
+        addLine1: v.addLine1,
+        addLine2: v.addLine2,
+        city: v.city,
+        state: v.state,
+        zipCode: v.zipCode,
+      }
+    } as any;
+    this.usersService.add(newUser);
+    // Download updated users.json so it can be persisted in repo
+    this.usersService.downloadJson('users.json');
+    this.toastr.success('Account created. Downloaded users.json — replace src/assets/users.json to persist.', 'Success');
+    this.router.navigateByUrl('/sign-in');
   }
 
   onSubmitSignIn() {
-    // alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.signInFormValue));
-    this.logsign_service.authLogin(this.signInFormValue.userEmail, this.signInFormValue.userPassword).subscribe(data => {
-      this.user_data = data;
-      if (this.user_data.length == 1) {
-        // alert("Validate")
-        if (this.user_data[0].role == "seller") {
-          sessionStorage.setItem("user_session_id", this.user_data[0].id);
-          sessionStorage.setItem("role", this.user_data[0].role);
-          this.router.navigateByUrl('/seller-dashboard');
-        } else if (this.user_data[0].role == "buyer") {
-          sessionStorage.setItem("user_session_id", this.user_data[0].id);
-          sessionStorage.setItem("role", this.user_data[0].role);
-          this.router.navigateByUrl('/buyer-dashboard');
-        } else {
-          alert("Invalid-user-role")
-        }
-      } else {
-        alert("Invalid")
-      }
-      console.log(this.user_data);
-
-    }, error => {
-      console.log("My error", error);
-    })
+    const fv = this.signInFormValue || {};
+    if (!fv.userEmail || !fv.userPassword) {
+      this.toastr.error('Please enter email and password', 'Validation');
+      return;
+    }
+    const user = this.usersService.findByCredentials(fv.userEmail, fv.userPassword);
+    if (!user) {
+      this.toastr.error('Invalid email or password', 'Sign in failed');
+      return;
+    }
+    sessionStorage.setItem('user_session_id', String(user.id));
+    sessionStorage.setItem('role', user.role);
+    if (user.role === 'admin') {
+      this.router.navigateByUrl('/admin/catalog');
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 
 }

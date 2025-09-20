@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -10,41 +10,27 @@ import { Router } from '@angular/router';
 export class HeaderComponent implements OnInit {
 
   logged_in: Boolean = false;
-  language: String = 'English';
   user_role: String;
 
-  constructor(private translate: TranslateService, private router: Router) { }
+  constructor(private router: Router, private cart: CartService) { }
 
 
-  ngOnInit() {
-    
-    
-  }
+  ngOnInit() {}
 
   ngDoCheck() {
     this.user_role = sessionStorage.getItem("role");
-    // console.log(this.user_role);
-    
     const user_session_id = sessionStorage.getItem("user_session_id")
-    if (user_session_id) {
-      this.logged_in = true;
-    }
+    this.logged_in = !!user_session_id;
   }
 
-  switchLanguage(language: string) {
-    this.translate.use(language);
-    if (language == 'en') {
-      this.language = "English";
-    } else if (language == 'hn') {
-      this.language = "हिंदी(Hindi)";
-    }
+  get cartCount(): number {
+    return this.cart.count();
   }
 
   logOut() {
     sessionStorage.removeItem("user_session_id");
     sessionStorage.removeItem("role");
-    this.router.navigateByUrl('/sign-in');
-    location.reload()
+    this.router.navigateByUrl('/');
   }
 
 }

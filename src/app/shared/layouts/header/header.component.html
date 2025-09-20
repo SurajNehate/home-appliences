@@ -13,6 +13,7 @@
   </a>
 
   <ng-container *ngIf="logged_in">
+    <span class="mr-2">Hi, {{displayName || 'User'}}</span>
     <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="user_role === 'admin'">
       Admin <mat-icon>expand_more</mat-icon>
     </button>

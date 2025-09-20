@@ -18,9 +18,30 @@
           </select>
           <input *ngIf="newProduct.category === '_new_'" class="form-control mt-2" [(ngModel)]="newCustomCategory" placeholder="Enter new category name">
         </div>
-        <div class="form-group col-md-4"><label>Image URL</label><input class="form-control" [(ngModel)]="newProduct.imageUrl" placeholder="https://drive.google.com/uc?export=view&id=..."></div>
+        <div class="form-group col-md-4"><label>Description</label><textarea rows="2" class="form-control" [(ngModel)]="newProduct.description"></textarea></div>
       </div>
-      <div class="form-group"><label>Description</label><textarea rows="2" class="form-control" [(ngModel)]="newProduct.description"></textarea></div>
+
+      <div class="border rounded p-2 mb-2">
+        <label class="mb-1">Images</label>
+        <div class="input-group mb-2">
+          <input class="form-control" [(ngModel)]="newImageUrl" placeholder="/assets/images/.. or https://...">
+          <div class="input-group-append"><button class="btn btn-outline-secondary" (click)="addImageToNew()">Add</button></div>
+        </div>
+        <div *ngIf="newProduct.images && newProduct.images.length">
+          <div class="d-flex align-items-center mb-1" *ngFor="let url of newProduct.images; let i = index">
+            <img [src]="url" width="48" height="48" class="mr-2" style="object-fit:cover;">
+            <input class="form-control form-control-sm mr-2" [(ngModel)]="newProduct.images[i]">
+            <button class="btn btn-sm btn-outline-secondary mr-1" (click)="moveNewImage(i,-1)">↑</button>
+            <button class="btn btn-sm btn-outline-secondary mr-1" (click)="moveNewImage(i,1)">↓</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="removeNewImage(i)">Remove</button>
+          </div>
+        </div>
+        <div class="mt-2">
+          <input type="file" multiple (change)="onUploadNewFiles($event)">
+          <small class="text-muted ml-2">You can upload images; they will be stored in the database.</small>
+        </div>
+      </div>
+
       <button class="btn btn-primary" (click)="addProduct()">Add</button>
     </div>
   </div>
@@ -29,20 +50,17 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <span>Products ({{products.length}})</span>
       <div class="d-flex align-items-center">
-<select class="form-control form-control-sm mr-2" #sectionSel (change)="onSectionChange(sectionSel.value)">
+        <select class="form-control form-control-sm mr-2" #sectionSel (change)="onSectionChange(sectionSel.value)">
           <option value="products" selected>Products</option>
           <option value="users">Users</option>
         </select>
-        <input type="file" accept="application/json" (change)="onFileSelected($event)">
-        <button class="btn btn-sm btn-outline-secondary ml-2" (click)="applyEditor()">Apply Editor</button>
-        <button class="btn btn-sm btn-success ml-2" (click)="downloadJson()">Download JSON</button>
       </div>
     </div>
     <div class="card-body">
       <table class="table table-sm table-bordered">
         <thead>
           <tr>
-            <th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Image</th><th></th>
+            <th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Main Image</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -52,18 +70,49 @@
             <td>₹ {{p.price}}</td>
             <td>{{p.category}}</td>
             <td><img [src]="p.imageUrl" width="60"></td>
-            <td><button class="btn btn-sm btn-danger" (click)="deleteProduct(p.id)">Delete</button></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary mr-1" (click)="startEdit(p)" *ngIf="editProductId!==p.id">Edit</button>
+              <button class="btn btn-sm btn-success mr-1" (click)="saveEdit()" *ngIf="editProductId===p.id">Save</button>
+              <button class="btn btn-sm btn-secondary mr-1" (click)="cancelEdit()" *ngIf="editProductId===p.id">Cancel</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteProduct(p.id)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="editProductId===p.id">
+            <td colspan="6">
+              <div class="form-row">
+                <div class="form-group col-md-4"><label>Name</label><input class="form-control" [(ngModel)]="editProduct.name"></div>
+                <div class="form-group col-md-2"><label>Price</label><input type="number" class="form-control" [(ngModel)]="editProduct.price"></div>
+                <div class="form-group col-md-3"><label>Category</label><input class="form-control" [(ngModel)]="editProduct.category"></div>
+                <div class="form-group col-md-3"><label>Description</label><input class="form-control" [(ngModel)]="editProduct.description"></div>
+              </div>
+              <div class="border rounded p-2">
+                <label class="mb-1">Images</label>
+                <div class="input-group mb-2">
+                  <input class="form-control" [(ngModel)]="editNewImageUrl" placeholder="/assets/images/... or https://...">
+                  <div class="input-group-append"><button class="btn btn-outline-secondary" (click)="addImageToEdit()">Add</button></div>
+                </div>
+                <div *ngIf="editProduct.images && editProduct.images.length">
+                  <div class="d-flex align-items-center mb-1" *ngFor="let url of editProduct.images; let i = index">
+                    <img [src]="url" width="48" height="48" class="mr-2" style="object-fit:cover;">
+                    <input class="form-control form-control-sm mr-2" [(ngModel)]="editProduct.images[i]">
+                    <button class="btn btn-sm btn-outline-secondary mr-1" (click)="moveEditImage(i,-1)">↑</button>
+                    <button class="btn btn-sm btn-outline-secondary mr-1" (click)="moveEditImage(i,1)">↓</button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeEditImage(i)">Remove</button>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <input type="file" multiple (change)="onUploadEditFiles($event)">
+                  <small class="text-muted ml-2">Uploaded files are stored in the database.</small>
+                </div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
-
-      <label>Raw JSON Editor</label>
-      <textarea class="form-control" rows="12" [(ngModel)]="editorText"></textarea>
     </div>
   </div>
 
   <div class="alert alert-info">
-    Tip: Upload images to Google Drive, set sharing to "Anyone with the link", and use URLs like
-    <code>https://drive.google.com/uc?export=view&id=FILE_ID</code> in the Image URL field.
+    Tip: Host images under <code>src/assets/images</code> or use external URLs. The first image becomes the product's main image.
   </div>
 </div>

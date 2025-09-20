@@ -34,8 +34,7 @@ export class SigninSignupComponent implements OnInit {
       this.regForm = false;
     }
 
-    // Ensure users.json is loaded before attempting sign-in
-    this.usersService.all().subscribe();
+    // No preload needed; sign-in uses auth-login function
 
     this.signUpform = this.formBuilder.group({
       name: ['', Validators.required],
@@ -94,11 +93,13 @@ export class SigninSignupComponent implements OnInit {
         zipCode: v.zipCode,
       }
     } as any;
-    this.usersService.add(newUser);
-    // Download updated users.json so it can be persisted in repo
-    this.usersService.downloadJson('users.json');
-    this.toastr.success('Account created. Downloaded users.json — replace src/assets/users.json to persist.', 'Success');
-    this.router.navigateByUrl('/sign-in');
+    this.usersService.signup(newUser).subscribe(
+      () => {
+        this.toastr.success('Account created', 'Success');
+        this.router.navigateByUrl('/sign-in');
+      },
+      () => this.toastr.error('Failed to create account', 'Error')
+    );
   }
 
   onSubmitSignIn() {
@@ -107,18 +108,21 @@ export class SigninSignupComponent implements OnInit {
       this.toastr.error('Please enter email and password', 'Validation');
       return;
     }
-    const user = this.usersService.findByCredentials(fv.userEmail, fv.userPassword);
-    if (!user) {
-      this.toastr.error('Invalid email or password', 'Sign in failed');
-      return;
-    }
-    sessionStorage.setItem('user_session_id', String(user.id));
-    sessionStorage.setItem('role', user.role);
-    if (user.role === 'admin') {
-      this.router.navigateByUrl('/admin/catalog');
-    } else {
-      this.router.navigateByUrl('/');
-    }
+    this.usersService.login(fv.userEmail, fv.userPassword).subscribe(
+      (res) => {
+        const user = res && res.user;
+        if (!user) { this.toastr.error('Invalid email or password', 'Sign in failed'); return; }
+        sessionStorage.setItem('user_session_id', String(user.id));
+        sessionStorage.setItem('role', user.role);
+        sessionStorage.setItem('jwt', res.token || '');
+        if (user.role === 'admin') {
+          this.router.navigateByUrl('/admin/catalog');
+        } else {
+          this.router.navigateByUrl('/');
+        }
+      },
+      () => this.toastr.error('Invalid email or password', 'Sign in failed')
+    );
   }
 
 }

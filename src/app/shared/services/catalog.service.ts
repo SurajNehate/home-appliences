@@ -15,16 +15,16 @@ export interface CatalogProduct {
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
-  private readonly productsUrl = 'assets/products.json';
+  private readonly apiBase = '/.netlify/functions/products';
   private products$ = new BehaviorSubject<CatalogProduct[]>([]);
   private loaded = false;
 
   constructor(private http: HttpClient) {}
 
-  // Load once and cache
+  // Load once and cache from API
   loadProducts(): Observable<CatalogProduct[]> {
     if (!this.loaded) {
-      this.http.get<CatalogProduct[]>(this.productsUrl).subscribe(list => {
+      this.http.get<CatalogProduct[]>(this.apiBase).subscribe(list => {
         this.products$.next(list || []);
         this.loaded = true;
       });
@@ -37,29 +37,35 @@ export class CatalogService {
   }
 
   getById(id: number): Observable<CatalogProduct | undefined> {
-    return this.getAll().pipe(map(list => list.find(p => p.id === id)));
+    // If already loaded, find locally; else hit API
+    if (this.loaded) {
+      return this.getAll().pipe(map(list => list.find(p => p.id === id)));
+    }
+    return this.http.get<CatalogProduct[]>(`${this.apiBase}?id=${id}`).pipe(map(rows => rows && rows[0]));
   }
 
   add(product: { name: string; price: number; imageUrl: string; category: string; description: string; images?: string[] }): void {
-    const list = [...this.products$.value];
-    const newId = list.length ? Math.max(...list.map(p => p.id)) + 1 : 1;
     const images = product.images && product.images.length ? product.images : (product.imageUrl ? [product.imageUrl] : []);
-    list.push({ id: newId, name: product.name, price: product.price, imageUrl: product.imageUrl, images, category: product.category, description: product.description });
-    this.products$.next(list);
+    this.http.post<CatalogProduct[]>(this.apiBase, { ...product, images }).subscribe(created => {
+      // API returns array of created rows
+      const newList = [...this.products$.value, ...(created || [])];
+      this.products$.next(newList);
+    });
   }
 
   update(product: CatalogProduct): void {
-    const list = [...this.products$.value];
-    const idx = list.findIndex(p => p.id === product.id);
-    if (idx >= 0) {
-      list[idx] = { ...product };
+    this.http.patch<CatalogProduct[]>(`${this.apiBase}?id=${product.id}`, product).subscribe(updated => {
+      // Replace local copy with server response (first row)
+      const updatedRow = (updated && updated[0]) || product;
+      const list = this.products$.value.map(p => (p.id === updatedRow.id ? updatedRow : p));
       this.products$.next(list);
-    }
+    });
   }
 
   remove(id: number): void {
-    const list = this.products$.value.filter(p => p.id !== id);
-    this.products$.next(list);
+    this.http.delete(`${this.apiBase}?id=${id}`).subscribe(() => {
+      this.products$.next(this.products$.value.filter(p => p.id !== id));
+    });
   }
 
   // Export current list as a downloadable products.json

@@ -12,7 +12,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { HomeComponent } from './home/home.component';
 
 
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 // Removed AdminModule/CustomerModule and legacy ProductCrudComponent for a simplified storefront
@@ -27,6 +27,8 @@ import { CatalogAdminComponent } from './admin/catalog-admin/catalog-admin.compo
 import { AdminLoginComponent } from './admin/admin-login/admin-login.component';
 import { SigninSignupComponent } from './customer/signin-signup/signin-signup.component';
 import { UsersAdminComponent } from './admin/users-admin/users-admin.component';
+
+import { HttpTokenInterceptor } from './core/interceptors/http.interceptors';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -73,7 +75,9 @@ export function HttpLoaderFactory(http: HttpClient) {
   exports: [
     TranslateModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: HttpTokenInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

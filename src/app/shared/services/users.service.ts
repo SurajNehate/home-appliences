@@ -28,15 +28,23 @@ export interface AdminUserRow {
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private readonly usersUrl = 'assets/users.json';
+  private readonly apiBase = '/.netlify/functions/users';
   private users$ = new BehaviorSubject<AdminUserRow[]>([]);
   private loaded = false;
 
   constructor(private http: HttpClient) {}
 
+  signup(row: { name: string; email: string; password: string; phone?: string; role?: 'admin' | 'member' }) {
+    return this.http.post<any>('/.netlify/functions/auth-signup', row);
+  }
+
+  login(email: string, password: string) {
+    return this.http.post<any>('/.netlify/functions/auth-login', { email, password });
+  }
+
   load(): Observable<AdminUserRow[]> {
     if (!this.loaded) {
-      this.http.get<AdminUserRow[]>(this.usersUrl).subscribe(list => {
+      this.http.get<AdminUserRow[]>(this.apiBase).subscribe(list => {
         this.users$.next(list || []);
         this.loaded = true;
       });
@@ -47,28 +55,30 @@ export class UsersService {
   all(): Observable<AdminUserRow[]> { return this.load(); }
 
   add(row: { name: string; email: string; password: string; phone?: string; role: 'admin' | 'member' }): void {
-    const list = [...this.users$.value];
-    const newId = list.length ? Math.max(...list.map(u => u.id)) + 1 : 1;
-    list.push({ id: newId, name: row.name, email: row.email, password: row.password, phone: row.phone || '', role: row.role });
-    this.users$.next(list);
+    this.http.post<AdminUserRow[]>(this.apiBase, row).subscribe(created => {
+      this.users$.next([...this.users$.value, ...(created || [])]);
+    });
   }
 
   findByCredentials(email: string, password: string): AdminUserRow | undefined {
+    // This is a simple client-side check; in production, implement secure auth
     const e = (email || '').toLowerCase();
     return this.users$.value.find(u => (u.email || '').toLowerCase() === e && u.password === password);
   }
 
   update(id: number, updates: Partial<AdminUserRow>): void {
-    const list = [...this.users$.value];
-    const index = list.findIndex(u => u.id === id);
-    if (index >= 0) {
-      list[index] = { ...list[index], ...updates };
-      this.users$.next(list);
-    }
+    this.http.patch<AdminUserRow[]>(`${this.apiBase}?id=${id}`, updates).subscribe(updated => {
+      const row = (updated && updated[0]) || undefined;
+      if (row) {
+        this.users$.next(this.users$.value.map(u => (u.id === id ? row : u)));
+      }
+    });
   }
 
   remove(id: number): void {
-    this.users$.next(this.users$.value.filter(u => u.id !== id));
+    this.http.delete(`${this.apiBase}?id=${id}`).subscribe(() => {
+      this.users$.next(this.users$.value.filter(u => u.id !== id));
+    });
   }
 
   downloadJson(filename = 'users.json'): void {

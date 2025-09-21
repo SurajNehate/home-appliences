@@ -10,7 +10,6 @@ import { CatalogService, CatalogProduct } from '../shared/services/catalog.servi
 export class HomeComponent implements OnInit {
   products: CatalogProduct[] = [];
   categories: string[] = [];
-  featured: CatalogProduct[] = [];
   activeCategory: string = 'All';
   searchTerm: string = '';
   isHandset = false;
@@ -22,7 +21,6 @@ export class HomeComponent implements OnInit {
     this.catalog.getAll().subscribe(list => {
       this.products = list;
       this.categories = Array.from(new Set(list.map(p => p.category)));
-      this.featured = list.slice(0, 4);
     });
     this.updateViewportFlags();
   }

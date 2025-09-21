@@ -99,10 +99,10 @@ exports.handler = async (event) => {
       
       // Extract base64 image data (remove data URL prefix if present)
       const mainImage = payload.imageData ? 
-        payload.imageData.replace(/^data:image/[a-z]+;base64,/, '') : null;
+        payload.imageData.replace(/^data:image\/[a-z]+;base64,/, '') : null;
       
       const additionalImages = Array.isArray(payload.additionalImages) ?
-        payload.additionalImages.map(img => img.replace(/^data:image/[a-z]+;base64,/, '')) : [];
+        payload.additionalImages.map(img => img.replace(/^data:image\/[a-z]+;base64,/, '')) : [];
 
       // Insert product with base64 image data
       const productQuery = `

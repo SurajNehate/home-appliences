@@ -1,1 +1,61 @@
-<p>product-form works!</p>
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()" style="display:grid; gap: 1rem; max-width: 720px;">
+  <h2 style="margin:0;">{{ product?.id ? 'Edit' : 'Add' }} Product</h2>
+
+  <div style="display:grid; gap: 0.25rem;">
+    <label>Name</label>
+    <input type="text" formControlName="name" placeholder="Name" />
+    <small *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" style="color:red;">Name is required (min 3)</small>
+  </div>
+
+  <div style="display:grid; gap: 0.25rem;">
+    <label>Price</label>
+    <input type="number" formControlName="price" placeholder="Price" />
+    <small *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" style="color:red;">Price must be >= 0</small>
+  </div>
+
+  <div style="display:grid; gap: 0.25rem;">
+    <label>Category</label>
+    <select formControlName="category">
+      <option value="" disabled>Select category</option>
+      <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+    </select>
+  </div>
+
+  <div style="display:grid; gap: 0.25rem;">
+    <label>Description</label>
+    <textarea rows="4" formControlName="description" placeholder="Description"></textarea>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:0.5rem;">
+    <input type="checkbox" formControlName="status" id="status" />
+    <label for="status">Active</label>
+  </div>
+
+  <fieldset style="border:1px solid #eee; padding: 1rem;">
+    <legend>Images</legend>
+
+    <div style="display:grid; gap:0.5rem; margin-bottom: 1rem;">
+      <label>Main image</label>
+      <input type="file" accept="image/*" (change)="onMainImageSelected($event)" />
+      <div *ngIf="mainImagePreview" style="margin-top:0.5rem;">
+        <img [src]="mainImagePreview" alt="Main preview" style="max-width: 240px; max-height: 240px; object-fit: contain;" />
+      </div>
+    </div>
+
+    <div style="display:grid; gap:0.5rem;">
+      <label>Additional images</label>
+      <input type="file" accept="image/*" multiple (change)="onAdditionalImagesSelected($event)" />
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <div *ngFor="let img of additionalImagePreviews; let i = index" style="position:relative;">
+          <img [src]="img" alt="Additional preview" style="width:120px; height:120px; object-fit: cover; border:1px solid #eee;" />
+          <button type="button" (click)="removeAdditionalImage(i)" style="position:absolute; top:0; right:0;">×</button>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div style="display:flex; gap:0.5rem; align-items:center;">
+    <button type="submit" [disabled]="productForm.invalid || isLoading">{{ isLoading ? 'Saving...' : 'Save' }}</button>
+    <button type="button" (click)="onCancel()">Cancel</button>
+  </div>
+</form>

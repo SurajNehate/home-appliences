@@ -1,1 +1,27 @@
-<p>product-list works!</p>
+<section>
+  <header style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h2 style="margin:0;">Products</h2>
+    <a routerLink="/products/add">+ Add Product</a>
+  </header>
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="error" style="color:red;">{{ error }}</div>
+
+  <div *ngIf="!loading && products.length === 0">No products found.</div>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+    <div *ngFor="let p of products" style="border: 1px solid #eee; border-radius: 6px; padding: 0.75rem;">
+      <div style="height: 160px; display:flex; align-items:center; justify-content:center; background:#fafafa; margin-bottom:0.5rem;">
+        <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" style="max-width:100%; max-height: 160px; object-fit: contain;" />
+        <div *ngIf="!p.imageUrl" style="color:#999; font-size: 12px;">No image</div>
+      </div>
+      <div style="font-weight:600;">{{ p.name }}</div>
+      <div style="color:#555;">{{ p.category }}</div>
+      <div style="margin: 0.25rem 0;">₹ {{ p.price }}</div>
+      <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+        <a [routerLink]="['/products/edit', p.id]">Edit</a>
+        <a href="#" (click)="$event.preventDefault(); deleteProduct(p.id)">Delete</a>
+      </div>
+    </div>
+  </div>
+</section>

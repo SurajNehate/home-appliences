@@ -1,7 +1,14 @@
 [build]
   command = "npm run build"
-  publish = "dist/home-decor-v19"
+  # Angular outputs the SPA to the "browser" subfolder when using SSR/static output
+  publish = "dist/home-decor-v19/browser"
   functions = "netlify/functions"
+
+# SPA fallback so client-side routes resolve to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [dev]
   command = "npm start"

@@ -68,6 +68,13 @@ export class CatalogAdminComponent implements OnInit {
     this.extractCategories(); // Refresh categories list
     
     this.toastr.success('Product added and saved to database.', 'Product Added');
+    this.addPanelOpen = false; // close panel on save
+  }
+
+  cancelAdd() {
+    this.newProduct = { name: '', price: 0, category: '', imageUrl: '', description: '', images: [] };
+    this.newCustomCategory = '';
+    this.addPanelOpen = false;
   }
 
   // Removed manual add-by-URL for new product; uploads only

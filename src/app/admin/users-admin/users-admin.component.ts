@@ -9,6 +9,7 @@ import { UsersService, AdminUserRow } from '../../shared/services/users.service'
 export class UsersAdminComponent implements OnInit {
   users: AdminUserRow[] = [];
   newUser: Partial<AdminUserRow> = { name: '', email: '', password: '', phone: '', role: 'member' } as any;
+  addPanelOpen = false;
 
   constructor(private usersService: UsersService) {}
 
@@ -17,6 +18,8 @@ export class UsersAdminComponent implements OnInit {
       this.users = list;
     });
   }
+
+  toggleAddPanel() { this.addPanelOpen = !this.addPanelOpen; }
 
   addUser() {
     if (!this.newUser.name || !this.newUser.email || !this.newUser.role) return;
@@ -29,6 +32,12 @@ export class UsersAdminComponent implements OnInit {
       role: (this.newUser.role as 'admin' | 'member') || 'member' 
     });
     this.newUser = { name: '', email: '', password: '', phone: '', role: 'member' } as any;
+    this.addPanelOpen = false; // close on save
+  }
+
+  cancelAdd() {
+    this.newUser = { name: '', email: '', password: '', phone: '', role: 'member' } as any;
+    this.addPanelOpen = false;
   }
 
   deleteUser(id: number) {

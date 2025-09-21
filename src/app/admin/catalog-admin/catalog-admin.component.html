@@ -1,12 +1,10 @@
 <!-- Admin navigation is now in main header -->
 <div class="container mt-3">
   <h2>Admin: Catalog Editor</h2>
-  <p class="text-muted">Add/Update/Delete products. When done, click "Download JSON" and replace <code>src/assets/products.json</code> in your repo, then push to trigger Netlify deploy.</p>
-
   <div class="card mb-3" style="position: relative;">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center" role="button" tabindex="0" (click)="toggleAddPanel()">
       <span>Add New Product</span>
-      <button class="btn btn-sm btn-outline-secondary" (click)="toggleAddPanel()">{{ addPanelOpen ? 'Hide' : 'Show' }}</button>
+      <span class="text-muted">{{ addPanelOpen ? 'Click to hide' : 'Click to add' }}</span>
     </div>
     <div class="card-body" *ngIf="addPanelOpen">
       <div class="form-row">
@@ -42,6 +40,7 @@
       </div>
 
       <div class="d-flex justify-content-end">
+        <button class="btn btn-secondary mr-2" (click)="cancelAdd()">Cancel</button>
         <button class="btn btn-primary" (click)="addProduct()">Add Product</button>
       </div>
     </div>

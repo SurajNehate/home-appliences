@@ -14,7 +14,7 @@ function neonHeaders(extra = {}) {
     ...extra,
   };
   
-  // Use basic authentication with rest_user credentials
+  // Use basic authentication - try multiple sources
   if (NEON_BASIC_AUTH) {
     headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
   } else if (NETLIFY_DATABASE_URL) {
@@ -31,6 +31,8 @@ function neonHeaders(extra = {}) {
       console.error('Failed to parse database URL for auth:', err.message);
     }
   }
+  
+  // If no auth is set, this will likely fail - which is expected for security
   
   headers['Prefer'] = headers['Prefer'] || 'return=representation';
   return headers;

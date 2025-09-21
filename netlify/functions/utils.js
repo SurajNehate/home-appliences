@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const NEON_REST_URL = process.env.NEON_REST_URL; // e.g. https://.../rest/v1
 const NEON_API_KEY = process.env.NEON_API_KEY;   // Bearer token (preferred)
 const NEON_BASIC_AUTH = process.env.NEON_BASIC_AUTH; // base64(username:password) if using basic auth
+const NETLIFY_DATABASE_URL = process.env.NETLIFY_DATABASE_URL; // Connection string from Neon integration
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 
 function neonHeaders(extra = {}) {
@@ -12,8 +13,29 @@ function neonHeaders(extra = {}) {
     'Content-Type': 'application/json',
     ...extra,
   };
-  if (NEON_API_KEY) headers['Authorization'] = `Bearer ${NEON_API_KEY}`;
-  else if (NEON_BASIC_AUTH) headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
+  
+  // Try different authentication methods
+  if (NEON_API_KEY) {
+    // Clean the API key of any whitespace
+    const cleanApiKey = NEON_API_KEY.trim();
+    headers['Authorization'] = `Bearer ${cleanApiKey}`;
+  } else if (NEON_BASIC_AUTH) {
+    headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
+  } else if (NETLIFY_DATABASE_URL) {
+    // Extract credentials from connection string
+    try {
+      const url = new URL(NETLIFY_DATABASE_URL);
+      const username = url.username;
+      const password = url.password;
+      if (username && password) {
+        const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+        headers['Authorization'] = `Basic ${credentials}`;
+      }
+    } catch (err) {
+      console.error('Failed to parse database URL for auth:', err.message);
+    }
+  }
+  
   headers['Prefer'] = headers['Prefer'] || 'return=representation';
   return headers;
 }

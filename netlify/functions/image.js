@@ -1,5 +1,14 @@
 'use strict';
-const { neonFetch } = require('./utils');
+const { Client } = require('pg');
+
+async function getDbClient() {
+  const client = new Client({
+    connectionString: process.env.NETLIFY_DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+  await client.connect();
+  return client;
+}
 
 // Optional runtime image processing
 let sharp;
@@ -13,18 +22,22 @@ try {
 // GET /.netlify/functions/image?id=123[&w=800&h=600&fit=cover&fmt=webp&q=80]
 // Streams the image as binary with correct content-type, optionally transformed
 exports.handler = async (event) => {
+  let client;
   try {
     if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
     const qs = event.queryStringParameters || {};
-    const id = qs.id;
+    const id = qs.id ? parseInt(qs.id, 10) : undefined;
     if (!id) return { statusCode: 400, body: 'Missing id' };
 
-    const rows = await neonFetch(`/product_images_bin?select=bytes,content_type,filename&id=eq.${id}`);
-    const r = Array.isArray(rows) ? rows[0] : null;
-    if (!r) return { statusCode: 404, body: 'Not Found' };
+    client = await getDbClient();
+    const result = await client.query(
+      'SELECT bytes, content_type, filename FROM product_images_bin WHERE id = $1',
+      [id]
+    );
+    const r = result.rows && result.rows[0];
+    if (!r) { await client.end(); return { statusCode: 404, body: 'Not Found' }; }
 
-    const hex = String(r.bytes || '');
-    let buf = hex && hex.startsWith('\\x') ? Buffer.from(hex.slice(2), 'hex') : Buffer.from([]);
+    let buf = Buffer.isBuffer(r.bytes) ? r.bytes : Buffer.from(String(r.bytes || '').replace(/^\\x/,'') || '', 'hex');
 
     let contentType = r.content_type || 'application/octet-stream';
     let filename = (r.filename || 'image').replace(/"/g,'');
@@ -59,6 +72,7 @@ exports.handler = async (event) => {
       buf = await pipe.toBuffer();
     }
 
+    await client.end();
     return {
       statusCode: 200,
       headers: {
@@ -70,6 +84,7 @@ exports.handler = async (event) => {
       body: buf.toString('base64')
     };
   } catch (err) {
+    if (client) { try { await client.end(); } catch (_) {} }
     return { statusCode: 500, body: JSON.stringify({ error: String(err) }) };
   }
 };

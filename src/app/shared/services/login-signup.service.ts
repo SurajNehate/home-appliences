@@ -14,13 +14,13 @@ export class LoginSignupService {
   constructor(private http: HttpClient, private apiService: ApiService) { }
 
   authLogin(user_name, password): Observable<any> {
-    return this.apiService.get(this.login_url + '/user?email=' + user_name + '&password=' + password);
+    return this.http.post('/.netlify/functions/auth-direct?action=login', { email: user_name, password });
   }
   userRegister(user_dto): Observable<any> {
-    return this.apiService.post(this.reg_url + '/user', user_dto);
+    return this.http.post('/.netlify/functions/auth-direct?action=signup', user_dto);
   }
 
   adminLogin(user_name, password): Observable<any> {
-    return this.apiService.get(this.login_url + '/user?email=' + user_name + '&password=' + password + '&role=admin');
+    return this.http.post('/.netlify/functions/auth-direct?action=login', { email: user_name, password });
   }
 }

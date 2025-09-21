@@ -15,7 +15,7 @@ export interface CatalogProduct {
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
-  private readonly apiBase = '/.netlify/functions/products';
+  private readonly apiBase = '/.netlify/functions/products-direct';
   private products$ = new BehaviorSubject<CatalogProduct[]>([]);
   private loaded = false;
 

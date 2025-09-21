@@ -28,18 +28,18 @@ export interface AdminUserRow {
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private readonly apiBase = '/.netlify/functions/users';
+  private readonly apiBase = '/.netlify/functions/users-direct';
   private users$ = new BehaviorSubject<AdminUserRow[]>([]);
   private loaded = false;
 
   constructor(private http: HttpClient) {}
 
   signup(row: { name: string; email: string; password: string; phone?: string; role?: 'admin' | 'member' }) {
-    return this.http.post<any>('/.netlify/functions/auth-signup', row);
+    return this.http.post<any>('/.netlify/functions/auth-direct?action=signup', row);
   }
 
   login(email: string, password: string) {
-    return this.http.post<any>('/.netlify/functions/auth-login', { email, password });
+    return this.http.post<any>('/.netlify/functions/auth-direct?action=login', { email, password });
   }
 
   load(): Observable<AdminUserRow[]> {

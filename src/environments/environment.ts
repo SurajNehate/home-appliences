@@ -12,9 +12,9 @@ export const environment = {
   },
   // Public contact info displayed on Contact page
   contact: {
-    phone: '+91-1234567890',
-    email: 'personal@gmail.com',
-    whatsapp: 'https://wa.me/911234567890'
+    phone: '+91-9503739981',
+    email: 'surajnehate@gmail.com',
+    whatsapp: 'https://wa.me/919503739981'
   }
 };
 

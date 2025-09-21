@@ -15,12 +15,11 @@ export class CatalogAdminComponent implements OnInit {
   newProduct: Partial<CatalogProduct> = { name: '', price: 0, category: '', imageUrl: '', description: '', images: [] };
   availableCategories: string[] = [];
   newCustomCategory: string = '';
+  addPanelOpen = false;
 
   // Editing state
   editProductId: number | null = null;
   editProduct: Partial<CatalogProduct> & { images: string[] } = { images: [] } as any;
-  newImageUrl: string = '';
-  editNewImageUrl: string = '';
 
   constructor(private catalog: CatalogService, private router: Router, private toastr: ToastrService, private http: HttpClient) {}
 
@@ -41,6 +40,10 @@ export class CatalogAdminComponent implements OnInit {
 
   onSectionChange(val: string) {
     if (val === 'users') { this.router.navigateByUrl('/admin/users'); }
+  }
+
+  toggleAddPanel() {
+    this.addPanelOpen = !this.addPanelOpen;
   }
 
   addProduct() {
@@ -67,13 +70,7 @@ export class CatalogAdminComponent implements OnInit {
     this.toastr.success('Product added and saved to database.', 'Product Added');
   }
 
-  addImageToNew() {
-    const url = (this.newImageUrl || '').trim();
-    if (!url) return;
-    (this.newProduct.images as string[]).push(url);
-    if (!this.newProduct.imageUrl) this.newProduct.imageUrl = url;
-    this.newImageUrl = '';
-  }
+  // Removed manual add-by-URL for new product; uploads only
 
   async onUploadNewFiles(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -125,13 +122,6 @@ export class CatalogAdminComponent implements OnInit {
     this.editProduct = { images: [] } as any;
   }
 
-  addImageToEdit() {
-    const url = (this.editNewImageUrl || '').trim();
-    if (!url) return;
-    this.editProduct.images.push(url);
-    if (!this.editProduct.imageUrl) this.editProduct.imageUrl = url;
-    this.editNewImageUrl = '';
-  }
 
   async onUploadEditFiles(event: Event) {
     const input = event.target as HTMLInputElement;

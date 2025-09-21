@@ -3,9 +3,12 @@
   <h2>Admin: Catalog Editor</h2>
   <p class="text-muted">Add/Update/Delete products. When done, click "Download JSON" and replace <code>src/assets/products.json</code> in your repo, then push to trigger Netlify deploy.</p>
 
-  <div class="card mb-3">
-    <div class="card-header">Add New Product</div>
-    <div class="card-body">
+  <div class="card mb-3" style="position: relative;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Add New Product</span>
+      <button class="btn btn-sm btn-outline-secondary" (click)="toggleAddPanel()">{{ addPanelOpen ? 'Hide' : 'Show' }}</button>
+    </div>
+    <div class="card-body" *ngIf="addPanelOpen">
       <div class="form-row">
         <div class="form-group col-md-3"><label>Name</label><input class="form-control" [(ngModel)]="newProduct.name"></div>
         <div class="form-group col-md-2"><label>Price</label><input type="number" class="form-control" [(ngModel)]="newProduct.price"></div>
@@ -23,10 +26,6 @@
 
       <div class="border rounded p-2 mb-2">
         <label class="mb-1">Images</label>
-        <div class="input-group mb-2">
-          <input class="form-control" [(ngModel)]="newImageUrl" placeholder="/assets/images/.. or https://...">
-          <div class="input-group-append"><button class="btn btn-outline-secondary" (click)="addImageToNew()">Add</button></div>
-        </div>
         <div *ngIf="newProduct.images && newProduct.images.length">
           <div class="d-flex align-items-center mb-1" *ngFor="let url of newProduct.images; let i = index">
             <img [src]="url" width="48" height="48" class="mr-2" style="object-fit:cover;">
@@ -38,11 +37,13 @@
         </div>
         <div class="mt-2">
           <input type="file" multiple (change)="onUploadNewFiles($event)">
-          <small class="text-muted ml-2">You can upload images; they will be stored in the database.</small>
+          <small class="text-muted ml-2">Upload images (stored in the database). The first image becomes the main image.</small>
         </div>
       </div>
 
-      <button class="btn btn-primary" (click)="addProduct()">Add</button>
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-primary" (click)="addProduct()">Add Product</button>
+      </div>
     </div>
   </div>
 
@@ -82,10 +83,6 @@
                 </div>
                 <div class="border rounded p-2">
                   <label class="mb-1">Images</label>
-                  <div class="input-group mb-2">
-                    <input class="form-control" [(ngModel)]="editNewImageUrl" placeholder="/assets/images/... or https://...">
-                    <div class="input-group-append"><button class="btn btn-outline-secondary" (click)="addImageToEdit()">Add</button></div>
-                  </div>
                   <div *ngIf="editProduct.images && editProduct.images.length">
                     <div class="d-flex align-items-center mb-1" *ngFor="let url of editProduct.images; let i = index">
                       <img [src]="url" width="48" height="48" class="mr-2" style="object-fit:cover;">
@@ -109,6 +106,6 @@
   </div>
 
   <div class="alert alert-info">
-    Tip: Host images under <code>src/assets/images</code> or use external URLs. The first image becomes the product's main image.
+    Tip: images should below 100kb for best performance. Use <a href="https://tinypng.com/" target="_blank">https://tinypng.com/</a> to compress images before uploading.
   </div>
 </div>

@@ -1,0 +1,69 @@
+<div class="container mt-3">
+  <h2>Admin: Orders</h2>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Orders ({{orders.length}})</span>
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <table class="table table-sm table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let o of orders">
+            <tr>
+              <td>{{o.id}}</td>
+              <td>
+                <div>{{o.customer_name}}</div>
+                <div class="text-muted" *ngIf="o.customer_address">{{o.customer_address}}</div>
+              </td>
+              <td>
+                <div *ngIf="o.customer_email">{{o.customer_email}}</div>
+                <div *ngIf="o.customer_phone">{{o.customer_phone}}</div>
+              </td>
+              <td>₹ {{o.total}}</td>
+              <td>{{o.status}}</td>
+              <td>{{o.created_at | date:'short'}}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary mr-1" (click)="toggle(o.id)">{{expanded[o.id] ? 'Hide' : 'View'}}</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="delete(o.id)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="expanded[o.id]">
+              <td colspan="7">
+                <table class="table table-sm mb-0">
+                  <thead>
+                    <tr>
+                      <th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let it of o.items">
+                      <td>
+                        <img *ngIf="it.image_url" [src]="it.image_url" width="40" height="40" style="object-fit:cover" class="mr-1">
+                        {{it.name}}
+                      </td>
+                      <td>{{it.qty}}</td>
+                      <td>₹ {{it.price}}</td>
+                      <td>₹ {{it.price * it.qty}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

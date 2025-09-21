@@ -27,6 +27,7 @@ import { CatalogAdminComponent } from './admin/catalog-admin/catalog-admin.compo
 import { AdminLoginComponent } from './admin/admin-login/admin-login.component';
 import { SigninSignupComponent } from './customer/signin-signup/signin-signup.component';
 import { UsersAdminComponent } from './admin/users-admin/users-admin.component';
+import { OrdersAdminComponent } from './admin/orders-admin/orders-admin.component';
 
 import { HttpTokenInterceptor } from './core/interceptors/http.interceptors';
 
@@ -47,7 +48,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     CatalogAdminComponent,
     AdminLoginComponent,
     SigninSignupComponent,
-    UsersAdminComponent
+    UsersAdminComponent,
+    OrdersAdminComponent
   ],
   imports: [
     CommonModule,

@@ -13,6 +13,7 @@ import { CartComponent } from './cart/cart.component';
 import { CheckoutGuestComponent } from './checkout-guest/checkout-guest.component';
 import { CatalogAdminComponent } from './admin/catalog-admin/catalog-admin.component';
 import { UsersAdminComponent } from './admin/users-admin/users-admin.component';
+import { OrdersAdminComponent } from './admin/orders-admin/orders-admin.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -30,6 +31,7 @@ const routes: Routes = [
   { path: 'admin-login', canActivate: [AdminAuthGuardLogin], component: AdminLoginComponent },
   { path: 'admin/catalog', canActivate: [AdminAuthGaurdService], component: CatalogAdminComponent },
   { path: 'admin/users', canActivate: [AdminAuthGaurdService], component: UsersAdminComponent },
+  { path: 'admin/orders', canActivate: [AdminAuthGaurdService], component: OrdersAdminComponent },
   // Fallback
   { path: '**', component: PageNotFoundErrorComponent }
 ];

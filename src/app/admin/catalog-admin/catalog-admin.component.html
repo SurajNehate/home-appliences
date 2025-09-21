@@ -49,12 +49,6 @@
   <div class="card mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
       <span>Products ({{products.length}})</span>
-      <div class="d-flex align-items-center">
-        <select class="form-control form-control-sm mr-2" #sectionSel (change)="onSectionChange(sectionSel.value)">
-          <option value="products" selected>Products</option>
-          <option value="users">Users</option>
-        </select>
-      </div>
     </div>
     <div class="card-body">
       <table class="table table-sm table-bordered">

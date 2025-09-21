@@ -1,11 +1,7 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 import { CartService } from '../shared/services/cart.service';
-
-function encode(data: Record<string,string>) {
-  return Object.keys(data)
-    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
-    .join('&');
-}
 
 @Component({
   selector: 'app-checkout-guest',
@@ -22,31 +18,19 @@ export class CheckoutGuestComponent {
   submitting = false;
   submitted = false;
 
-  constructor(private cart: CartService) {}
+  constructor(private cart: CartService, private http: HttpClient, private toastr: ToastrService) {}
 
   async submit() {
     this.submitting = true;
-    const cartData = JSON.stringify(this.cart.getItems());
-    const body = encode({
-      'form-name': 'checkout',
-      ...this.form,
-      cart: cartData
-    });
     try {
-      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-        // Simulate success locally (Netlify Forms works in production only)
-        await new Promise(r => setTimeout(r, 300));
-      } else {
-        await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body
-        });
-      }
+      const items = this.cart.getItems().map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, imageUrl: i.imageUrl }));
+      const customer = { name: this.form.name, email: this.form.email, phone: this.form.phone, address: this.form.address };
+      await this.http.post('/.netlify/functions/orders-direct', { customer, items }).toPromise();
       this.submitted = true;
+      this.toastr.success('Order placed successfully!', 'Thank you');
       this.cart.clear();
     } catch (e) {
-      alert('Failed to submit. Please try again.');
+      this.toastr.error('Failed to place order. Please try again.', 'Checkout Error');
     } finally {
       this.submitting = false;
     }

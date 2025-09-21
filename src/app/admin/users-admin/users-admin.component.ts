@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { UsersService, AdminUserRow } from '../../shared/services/users.service';
 
 @Component({
@@ -9,22 +8,14 @@ import { UsersService, AdminUserRow } from '../../shared/services/users.service'
 })
 export class UsersAdminComponent implements OnInit {
   users: AdminUserRow[] = [];
-  editorText = '';
   newUser: Partial<AdminUserRow> = { name: '', email: '', password: '', phone: '', role: 'member' } as any;
 
-  constructor(private usersService: UsersService, private router: Router) {}
-
-  // Logout functionality moved to main header
+  constructor(private usersService: UsersService) {}
 
   ngOnInit() {
     this.usersService.all().subscribe(list => {
       this.users = list;
-      this.editorText = JSON.stringify(list, null, 2);
     });
-  }
-
-  onSectionChange(val: string) {
-    if (val === 'products') { this.router.navigateByUrl('/admin/catalog'); }
   }
 
   addUser() {
@@ -42,27 +33,5 @@ export class UsersAdminComponent implements OnInit {
 
   deleteUser(id: number) {
     this.usersService.remove(id);
-  }
-
-  downloadJson() {
-    this.usersService.downloadJson('users.json');
-  }
-
-  applyEditor() {
-    this.usersService.importFromJson(this.editorText);
-  }
-
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files && input.files.length ? input.files[0] : undefined;
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const text = String((e.target as FileReader).result);
-      this.editorText = text;
-      this.applyEditor();
-    };
-    reader.readAsText(file);
-    input.value = '';
   }
 }

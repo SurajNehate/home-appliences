@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CatalogService, CatalogProduct } from '../../shared/services/catalog.service';
 import { CartService } from '../../shared/services/cart.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-detail',
@@ -18,7 +19,8 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private catalog: CatalogService,
-    private cart: CartService
+    private cart: CartService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -67,6 +69,6 @@ export class ProductDetailComponent implements OnInit {
     if (!this.product) return;
     const p = this.product;
     this.cart.add({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl }, 1);
-    alert('Added to cart');
+    this.toastr.success(`${p.name} added to cart`, 'Added to Cart');
   }
 }

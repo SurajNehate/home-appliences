@@ -61,7 +61,34 @@ CREATE INDEX IF NOT EXISTS idx_products_desc_trgm         ON public.products USI
 CREATE INDEX IF NOT EXISTS idx_product_images_product     ON public.product_images (product_id, sort_order);
 CREATE INDEX IF NOT EXISTS idx_product_images_bin_product ON public.product_images_bin (product_id);
 
--- 7) (Optional) Grants for your REST role
+-- 7) Orders tables
+-- These support checkout and admin order management
+CREATE TABLE IF NOT EXISTS public.orders (
+  id              SERIAL PRIMARY KEY,
+  user_id         INTEGER REFERENCES public.users(id) ON DELETE SET NULL,
+  customer_name   TEXT NOT NULL,
+  customer_email  TEXT,
+  customer_phone  TEXT,
+  customer_address TEXT,
+  total           NUMERIC(10,2) NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'new', -- new, paid, shipped, cancelled, completed
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.order_items (
+  id          SERIAL PRIMARY KEY,
+  order_id    INTEGER NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  product_id  INTEGER REFERENCES public.products(id) ON DELETE SET NULL,
+  name        TEXT NOT NULL,           -- snapshot of product name
+  price       NUMERIC(10,2) NOT NULL,  -- snapshot of price at order time
+  qty         INTEGER NOT NULL,
+  image_url   TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_user ON public.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items(order_id);
+
+-- 8) (Optional) Grants for your REST role
 -- Replace <rest_role> with the role used by your NEON_API_KEY or Basic auth.
 -- If unsure, you can skip; many setups already have adequate privileges.
 -- GRANT USAGE ON SCHEMA public TO <rest_role>;

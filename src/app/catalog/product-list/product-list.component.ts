@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CatalogService, CatalogProduct } from '../../shared/services/catalog.service';
 import { CartService } from '../../shared/services/cart.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-list',
@@ -14,7 +15,7 @@ export class ProductListComponent implements OnInit {
   activeCategory: string = 'All';
   searchTerm: string = '';
 
-  constructor(private catalog: CatalogService, private cart: CartService, private route: ActivatedRoute) {}
+constructor(private catalog: CatalogService, private cart: CartService, private route: ActivatedRoute, private toastr: ToastrService) {}
 
   ngOnInit() {
     this.catalog.getAll().subscribe(list => {
@@ -46,6 +47,6 @@ export class ProductListComponent implements OnInit {
 
   addToCart(p: CatalogProduct) {
     this.cart.add({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl }, 1);
-    alert('Added to cart');
+    this.toastr.success(`${p.name} added to cart`, 'Added to Cart');
   }
 }

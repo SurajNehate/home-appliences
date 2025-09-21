@@ -22,6 +22,7 @@
       <mat-menu #adminMenu="matMenu">
         <button mat-menu-item routerLink="/admin/catalog">Products</button>
         <button mat-menu-item routerLink="/admin/users">Users</button>
+        <button mat-menu-item routerLink="/admin/orders">Orders</button>
       </mat-menu>
       <a mat-button routerLink="/my-profile">{{'header.my_profile' | translate}}</a>
       <button mat-button (click)="logOut()">{{'header.signout' | translate}}</button>
@@ -57,5 +58,6 @@
   <mat-menu #mobileAdminMenu="matMenu">
     <button mat-menu-item routerLink="/admin/catalog">Products</button>
     <button mat-menu-item routerLink="/admin/users">Users</button>
+    <button mat-menu-item routerLink="/admin/orders">Orders</button>
   </mat-menu>
 </mat-toolbar>

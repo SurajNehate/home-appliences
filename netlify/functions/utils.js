@@ -14,13 +14,13 @@ function neonHeaders(extra = {}) {
     ...extra,
   };
   
-  // Try different authentication methods
-  if (NEON_API_KEY) {
+  // Try different authentication methods - prioritize Basic Auth since rest_user uses it
+  if (NEON_BASIC_AUTH) {
+    headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
+  } else if (NEON_API_KEY) {
     // Clean the API key of any whitespace
     const cleanApiKey = NEON_API_KEY.trim();
     headers['Authorization'] = `Bearer ${cleanApiKey}`;
-  } else if (NEON_BASIC_AUTH) {
-    headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
   } else if (NETLIFY_DATABASE_URL) {
     // Extract credentials from connection string
     try {

@@ -15,6 +15,7 @@ exports.handler = async (event) => {
       neonApiKeyPrefix: NEON_API_KEY ? NEON_API_KEY.substring(0, 20) + '...' : null,
       hasBasicAuth: !!NEON_BASIC_AUTH,
       basicAuthLength: NEON_BASIC_AUTH ? NEON_BASIC_AUTH.length : 0,
+      authMethodUsed: NEON_BASIC_AUTH ? 'Basic Auth' : (NEON_API_KEY ? 'API Key (Bearer)' : 'None'),
     };
 
     return {

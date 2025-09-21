@@ -1,11 +1,7 @@
-<header style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; gap: 1rem; align-items: center;">
-  <strong>Home Decor</strong>
-  <nav style="display: flex; gap: 1rem;">
-    <a routerLink="/">Home</a>
-    <a routerLink="/products">Products</a>
-    <a routerLink="/products/add">Add Product</a>
-  </nav>
-</header>
-<main style="padding: 1rem;">
-  <router-outlet />
+<app-header></app-header>
+
+<main class="container" [ngStyle]="{'min-height.px': footerMaxHeight}">
+    <router-outlet></router-outlet>
 </main>
+<hr class="featurette-divider mt-3">
+<app-footer></app-footer>

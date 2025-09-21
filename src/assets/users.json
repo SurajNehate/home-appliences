@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "name": "Suraj Nehate",
+    "email": "admin@gmail.com",
+    "password": "123456",
+    "phone": "1234567891",
+    "role": "admin",
+    "age": 27,
+    "dob": "1992-09-17",
+    "gender": "Male",
+    "language": "English",
+    "aboutYou": "I am a programmer and admin of this home decor store.",
+    "uploadPhoto": "",
+    "agreetc": true,
+    "address": {
+      "id": 0,
+      "addLine1": "Pune",
+      "addLine2": "Pune",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "zipCode": "510431"
+    }
+  },
+  {
+    "id": 2,
+    "name": "Member",
+    "email": "member@gmail.com",
+    "password": "123456",
+    "phone": "0123456789",
+    "role": "member",
+    "age": 25,
+    "dob": "2019-12-31",
+    "gender": "Male",
+    "language": "Oriya/Odiya",
+    "aboutYou": "I am a member interested in home decor items.",
+    "uploadPhoto": "",
+    "agreetc": true,
+    "address": {
+      "id": 0,
+      "addLine1": "Marathalli",
+      "addLine2": "Aswathnagar",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "zipCode": "560037"
+    }
+  }
+]

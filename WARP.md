@@ -2,112 +2,151 @@
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
-Project type: Angular 19 (standalone) with SSR via @angular/ssr + Express
+## Development Commands
 
-Common commands
+### Prerequisites
+- Node.js (install from https://nodejs.org/en/)
+- Angular CLI: `npm install -g @angular/cli`
+- JSON Server (for mock API): `npm install -g json-server`
 
-- Dev server (client-side, default at http://localhost:4200):
-```bash path=null start=null
-ng serve
+### Setup
+```bash
+npm install
 ```
-  - Alternatively:
-```bash path=null start=null
+
+### Development Server
+This application requires two servers running simultaneously:
+
+**Terminal 1 (Angular dev server):**
+```bash
 npm start
+# or: cross-env NODE_OPTIONS=--openssl-legacy-provider ng serve
 ```
 
-- Build (production by default per angular.json):
-```bash path=null start=null
-ng build
+**Terminal 2 (Mock API server):**
+```bash
+json-server --watch mock-api-data.json
 ```
 
-- Build (development config + watch):
-```bash path=null start=null
-ng build --configuration development --watch
+The application will be available at http://localhost:4200 and mock API at http://localhost:3000
+
+### Build and Testing
+```bash
+# Production build
+npm run build
+# or: cross-env NODE_OPTIONS=--openssl-legacy-provider ng build
+
+# Run unit tests
+npm test
+# or: ng test
+
+# Run end-to-end tests
+npm run e2e
+# or: ng e2e
+
+# Lint the code
+npm run lint
+# or: ng lint
 ```
-  - Alternatively (script):
-```bash path=null start=null
-npm run watch
+
+### Running Single Tests
+```bash
+# Run specific test file
+ng test --include="**/component-name.spec.ts"
+
+# Run tests in watch mode for specific component
+ng test --watch --include="**/cart.service.spec.ts"
 ```
 
-- Run unit tests (Karma + Jasmine):
-```bash path=null start=null
-ng test
+## Architecture Overview
+
+### Dual-Mode Application
+This codebase supports two deployment modes:
+
+1. **Full Ecommerce Mode**: Uses `mock-api-data.json` with JSON Server for complete user management with admin/member roles and order processing
+2. **Static Catalog Mode**: Uses `src/assets/products.json` for Netlify-compatible static deployment with guest cart and form submissions
+
+### Module Structure
+- **AppModule**: Main application module with all components declared (simplified from modular architecture)
+- **SharedModule**: Contains reusable components, services, and directives
+- **Core Services**: 
+  - `CatalogService`: Manages product data (static JSON or API)
+  - `CartService`: Browser localStorage-based cart for guest users
+  - `AuthGuardService`: Admin authentication for catalog management
+
+### Key Components
+- **Public Pages**: Home, Catalog (product list/detail), Cart, Checkout, Contact
+- **Admin Pages**: Login, Catalog Editor, User Management
+- **Shared Layouts**: Header, Footer, Page Not Found
+
+### Data Models
+- **Static Mode**: Products stored in `src/assets/products.json` with Google Drive image URLs
+- **Full Mode**: Users (admin/member roles), products, and orders in `mock-api-data.json`
+
+## Static Deployment (Netlify)
+
+### Product Management
+- Admin can edit catalog at `/admin/catalog` (login: admin@gmail.com / 123456)
+- Changes are in-memory only - use "Download JSON" to get updated `products.json`
+- Replace `src/assets/products.json` and redeploy to update live catalog
+
+### Image Handling
+Products use Google Drive public URLs in format:
+```
+https://drive.google.com/uc?export=view&id=<FILE_ID>
 ```
 
-- Run a single spec file (recommended approach):
-```bash path=null start=null
-ng test --include src/app/app.component.spec.ts
+### Form Submissions
+- Checkout and Contact forms submit to Netlify Forms
+- Hidden form registrations in `src/index.html`
+- Configure email notifications in Netlify dashboard
+
+## Development Notes
+
+### Legacy OpenSSL Support
+This Angular 8 project requires legacy OpenSSL provider due to Node.js compatibility:
+```bash
+cross-env NODE_OPTIONS=--openssl-legacy-provider
 ```
-  - You can also temporarily focus tests using Jasmine’s fit/fdescribe in a spec when iterating locally.
 
-- Serve the built SSR bundle (after ng build):
-```bash path=null start=null
-npm run serve:ssr:home-decor-v19
+### Environment Configuration
+- Development: `src/environments/environment.ts`
+- Production: `src/environments/environment.prod.ts`
+- Admin credentials and contact info configured in environment files
+
+### Cart Implementation
+Guest cart uses browser localStorage with key `guest_cart_v1`. No server persistence required.
+
+### Translation Support
+Configured with `@ngx-translate` for internationalization, language files in `src/assets/i18n/`
+
+### Styling
+- Bootstrap 4.3.1 for UI framework
+- Font Awesome for icons
+- SCSS for component styles
+- Global styles in `src/styles.scss`
+
+### Testing Framework
+- Jasmine + Karma for unit tests
+- Protractor for e2e tests
+- TSLint for code quality (max line length: 140 chars)
+
+## Route Structure
 ```
-  - The SSR server listens on PORT or defaults to http://localhost:4000 as defined in src/server.ts.
+/ - Home page
+/catalog - Product listing
+/catalog/:id - Product details
+/cart - Shopping cart
+/checkout-guest - Guest checkout with Netlify form
+/contact-us - Contact form
+/admin-login - Admin authentication
+/admin/catalog - Product catalog editor (requires admin login)
+/admin/users - User management (requires admin login)
+```
 
-Notes on linting
+## Admin Static Login
+Default credentials configured in `src/environments/environment.ts`:
+- Username: admin@gmail.com  
+- Password: 123456
 
-- No lint configuration/script is present (e.g., ESLint) in package.json at the time of writing.
-
-High-level architecture
-
-- Framework/runtime
-  - Angular 19 standalone application (no NgModules). Bootstrap via bootstrapApplication in src/main.ts and src/main.server.ts.
-  - Router and HttpClient are provided in src/app/app.config.ts.
-
-- Routing
-  - Routes are declared in src/app/app.routes.ts with the following paths:
-    - '' → redirects to '/products'
-    - '/products' → ProductListComponent
-    - '/products/add' → ProductFormComponent
-    - '/products/edit/:id' → ProductFormComponent
-
-- Components
-  - ProductListComponent (src/app/components/product-list/product-list.component.ts): list view shell.
-  - ProductFormComponent (src/app/components/product-form/product-form.component.ts): reactive form; supports selecting a main image and additional images with base64 previews; emits productSaved/cancelled events; uses ProductService to create/update.
-
-- Services / data access
-  - ProductService (src/app/services/product.service.ts)
-    - API base: '/.netlify/functions'
-    - Exposes CRUD methods for products and image upload; attaches Authorization header from localStorage when present.
-  - AuthService (src/app/services/auth.service.ts)
-    - API base: '/.netlify/functions'
-    - Handles login/signup (stores a JWT in localStorage), logout, current-user retrieval, basic role check, and token access.
-  - Note: These services assume Netlify Functions endpoints (products-direct, image-upload, auth-direct) are available at runtime. They are not implemented in this repo.
-
-- SSR setup
-  - Angular SSR configuration:
-    - src/main.server.ts bootstraps the app with server-specific providers from src/app/app.config.server.ts.
-    - src/app/app.routes.server.ts uses RenderMode.Prerender with a wildcard to prerender routes.
-  - Node/Express server:
-    - src/server.ts uses @angular/ssr/node and Express to serve static files from the browser build and render remaining routes server-side. Default port is 4000 unless PORT env var is set.
-  - Build output
-    - After ng build, the dist/home-decor-v19 directory contains browser and server outputs; the SSR entry script referenced by the provided npm script is dist/home-decor-v19/server/server.mjs.
-
-Testing
-
-- Unit tests are configured with Karma + Jasmine (see tsconfig.spec.json and the sample spec at src/app/app.component.spec.ts).
-- Quick iteration patterns:
-  - Filter to a single spec file with --include.
-  - Use fit/fdescribe to focus specific tests/specs during local development.
-
-Relevant files and where to look
-
-- Project configuration: angular.json, tsconfig*.json
-- App bootstrap: src/main.ts, src/main.server.ts
-- App config/providers: src/app/app.config.ts, src/app/app.config.server.ts
-- Routing: src/app/app.routes.ts, src/app/app.routes.server.ts
-- SSR server: src/server.ts
-- Services: src/app/services/product.service.ts, src/app/services/auth.service.ts
-
-Important excerpts from README.md
-
-- Development server: ng serve → http://localhost:4200
-- Build: ng build → outputs to dist/
-- Unit tests: ng test
-- E2E tests: not configured by default (Angular CLI no longer includes one by default; choose and integrate as needed)
-
-Tooling/rules files
-
-- No CLAUDE rules (CLAUDE.md), Cursor rules (.cursor/rules/ or .cursorrules), or Copilot instructions (.github/copilot-instructions.md) were found at the time of writing.
+Change these before deployment to production.

@@ -1,59 +1,100 @@
-# HomeDecorV19
+# angular-ecommerce
+Home decor ecommerce portal with admin catalog management and guest shopping. Users can register as members to browse products and make purchases.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.8.
+# Project Setup
+**Step 1:** clone the project: ``` git clone https://github.com/SrikrushnaP/angular-ecommerce.git ```
 
-## Development server
+**Step 2:** ``` cd angular-ecommerce ```
 
-To start a local development server, run:
+ **Step 3:** ``` git pull origin develop ``` or ``` master ``` 
 
-```bash
-ng serve
+**Step 4:** Install Node form  https://nodejs.org/en/
+
+**Step 5:** ``` npm install ```
+
+**Step 6:** ``` npm install -g json-server ``` (Install JSON mock server)
+
+**Step 7:** ```npm install -g @angular/cli ``` (Install angular CLI)
+
+**Step 8:** Open two terminal/command prompt  
+
+**Step 9:** In one run command:   ``` ng serve ```
+
+**Step 10:** Another one run command:  ``` json-server --watch mock-api-data.json ```
+
+
+Now you can ready to go 
+
+**Step 11:** Open your browser and type: http://localhost:4200
+
+If you want to see the mock api on your browser you can hit the link: http://localhost:3000/
+
+If you want to learn more on mock API you can go through the doc https://www.npmjs.com/package/json-server
+
+# Project Documentation: 
+https://docs.google.com/document/d/1NdB3SdAbKSFcPooap-ddpHdQQxBDvAieH2bPF4NCLMU/edit?usp=sharing
+
+---
+
+## Static Catalog + Netlify (Home Decor)
+
+This project now supports a fully static catalog suitable for Netlify deployments:
+
+- Product data: `src/assets/products.json`
+- Product images: Public Google Drive URLs in the form `https://drive.google.com/uc?export=view&id=<FILE_ID>`
+- Guest cart: browser localStorage
+- Checkout & Contact: Netlify Forms (email notifications)
+- Admin: Simple static login and a Catalog Editor that lets you modify products in-memory and download an updated `products.json` file
+
+### Admin Login (static)
+Configure static admin credentials in `src/environments/environment.ts`:
+
+```
+adminLogin: { username: 'admin', password: 'admin123' }
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Login at `/admin-login`. On success, you’ll be redirected to `/admin/catalog`.
 
-## Code scaffolding
+### Admin Catalog Editor
+- Go to `/admin/catalog`
+- Add/Update/Delete products
+- Click "Download JSON" to download the updated `products.json`
+- Replace `src/assets/products.json` with the downloaded file and commit/push to trigger Netlify auto-deploy
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Google Drive images
+- Upload image to Google Drive
+- Right-click → Share → Anyone with the link
+- Get the file ID from the share link
+- Use: `https://drive.google.com/uc?export=view&id=<FILE_ID>` as `imageUrl`
 
-```bash
-ng generate component component-name
-```
+### Netlify Forms (Checkout & Contact)
+- Hidden forms are registered in `src/index.html`
+- The Checkout page (`/checkout-guest`) and Contact page (`/contact-us`) submit programmatically to Netlify Forms
+- In Netlify dashboard → Site settings → Forms → Notifications → add email notifications for `checkout` and `contact` forms
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Public Pages
+- Home: `/`
+- Catalog: `/catalog` (categories: Curtains, Appliances)
+- Product detail: `/catalog/:id`
+- Cart: `/cart`
+- Checkout: `/checkout-guest`
+- Contact: `/contact-us`
 
-```bash
-ng generate --help
-```
+### Data Sources
+The application supports two data source configurations:
 
-## Building
+1. **Static Mode (Recommended for Netlify)**: 
+   - User data: `src/assets/users.json`
+   - Product data: `src/assets/products.json`
+   - No server required, works with static hosting
 
-To build the project run:
+2. **Full Development Mode (with JSON Server)**:
+   - All data: `mock-api-data.json` 
+   - Requires `json-server --watch mock-api-data.json` running on port 3000
+   - Useful for development with API-like behavior
 
-```bash
-ng build
-```
+**Current Implementation**: The app now uses static JSON files by default. The admin interface allows editing and downloading updated JSON files for manual deployment.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Notes
+- No server required for catalog and checkout/contact emails (Netlify handles form notifications)
+- For advanced automation (auto-save products), consider moving `products.json` to a backend or using GitHub API write access via Netlify Functions

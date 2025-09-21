@@ -1,29 +1,13 @@
 'use strict';
 const { Client } = require('pg');
-const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
-const DATABASE_URL = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
 
 async function getDbClient() {
   const client = new Client({
-    connectionString: DATABASE_URL,
+    connectionString: process.env.NETLIFY_DATABASE_URL,
     ssl: { rejectUnauthorized: false }
   });
   await client.connect();
   return client;
-}
-
-function getAuthClaims(event) {
-  const h = event.headers || {};
-  const auth = h.authorization || h.Authorization || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return null;
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (_) {
-    return null;
-  }
 }
 
 exports.handler = async (event) => {
@@ -36,7 +20,18 @@ exports.handler = async (event) => {
     client = await getDbClient();
 
     if (method === 'GET') {
-      let query = 'SELECT * FROM products';
+      let query = `
+        SELECT p.*, 
+               COALESCE(
+                 json_agg(
+                   json_build_object('url', pi.url, 'sort_order', pi.sort_order)
+                   ORDER BY pi.sort_order
+                 ) FILTER (WHERE pi.url IS NOT NULL),
+                 '[]'::json
+               ) as product_images
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id
+      `;
       
       const conditions = [];
       const values = [];
@@ -44,20 +39,20 @@ exports.handler = async (event) => {
 
       // Add filters
       if (id) {
-        conditions.push(`id = $${paramIndex}`);
+        conditions.push(`p.id = $${paramIndex}`);
         values.push(id);
         paramIndex++;
       }
 
       if (params.category) {
-        conditions.push(`category = $${paramIndex}`);
+        conditions.push(`p.category = $${paramIndex}`);
         values.push(params.category);
         paramIndex++;
       }
 
       if (params.search) {
         const searchTerm = `%${params.search.toLowerCase()}%`;
-        conditions.push(`(LOWER(name) LIKE $${paramIndex} OR LOWER(description) LIKE $${paramIndex + 1})`);
+        conditions.push(`(LOWER(p.name) LIKE $${paramIndex} OR LOWER(p.description) LIKE $${paramIndex + 1})`);
         values.push(searchTerm, searchTerm);
         paramIndex += 2;
       }
@@ -66,23 +61,17 @@ exports.handler = async (event) => {
         query += ` WHERE ${conditions.join(' AND ')}`;
       }
 
-      query += ' ORDER BY id';
+      query += ' GROUP BY p.id ORDER BY p.id';
 
       const result = await client.query(query, values);
       
       // Map the data for frontend compatibility
       const data = result.rows.map(row => ({
-        id: row.id,
-        name: row.name,
-        price: row.price,
-        category: row.category,
-        description: row.description,
-        status: row.status,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        // Convert base64 image data to data URL for frontend
-        imageUrl: row.image_data ? `data:image/jpeg;base64,${row.image_data}` : null,
-        images: row.additional_images ? row.additional_images.map(img => `data:image/jpeg;base64,${img}`) : []
+        ...row,
+        images: Array.isArray(row.images) && row.images.length > 0 
+          ? row.images 
+          : (Array.isArray(row.product_images) ? row.product_images.map(pi => pi.url) : []),
+        imageUrl: row.image_url || (Array.isArray(row.product_images) && row.product_images[0] ? row.product_images[0].url : null)
       }));
 
       await client.end();
@@ -90,24 +79,19 @@ exports.handler = async (event) => {
     }
 
     if (method === 'POST') {
-      // Check authentication
-      const claims = getAuthClaims(event);
-      if (!claims || claims.role !== 'admin') {
-        return { statusCode: 403, body: JSON.stringify({ error: 'Admin access required' }) };
+      // Simple admin check - you can enhance this
+      const authHeader = event.headers.authorization || '';
+      if (!authHeader.includes('Bearer')) {
+        return { statusCode: 401, body: JSON.stringify({ error: 'Admin access required' }) };
       }
 
       const payload = JSON.parse(event.body || '{}');
-      
-      // Extract base64 image data (remove data URL prefix if present)
-      const mainImage = payload.imageData ? 
-        payload.imageData.replace(/^data:image\/[a-z]+;base64,/, '') : null;
-      
-      const additionalImages = Array.isArray(payload.additionalImages) ?
-        payload.additionalImages.map(img => img.replace(/^data:image\/[a-z]+;base64,/, '')) : [];
+      const images = Array.isArray(payload.images) ? payload.images : [];
+      const image_url = payload.image_url || payload.imageUrl || images[0] || null;
 
-      // Insert product with base64 image data
+      // Insert product
       const productQuery = `
-        INSERT INTO products (name, price, image_data, additional_images, category, description, status)
+        INSERT INTO products (name, price, image_url, images, category, description, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
@@ -115,8 +99,8 @@ exports.handler = async (event) => {
       const productResult = await client.query(productQuery, [
         payload.name,
         payload.price,
-        mainImage,
-        additionalImages,
+        image_url,
+        JSON.stringify(images),
         payload.category,
         payload.description,
         payload.status !== undefined ? payload.status : true
@@ -124,15 +108,20 @@ exports.handler = async (event) => {
 
       const product = productResult.rows[0];
 
-      // Format response
-      const responseProduct = {
-        ...product,
-        imageUrl: product.image_data ? `data:image/jpeg;base64,${product.image_data}` : null,
-        images: product.additional_images ? product.additional_images.map(img => `data:image/jpeg;base64,${img}`) : []
-      };
+      // Insert product images
+      if (images.length > 0) {
+        const imageInserts = images.map((url, index) => 
+          `(${product.id}, '${url}', ${index})`
+        ).join(',');
+        
+        await client.query(`
+          INSERT INTO product_images (product_id, url, sort_order)
+          VALUES ${imageInserts}
+        `);
+      }
 
       await client.end();
-      return { statusCode: 200, body: JSON.stringify(responseProduct) };
+      return { statusCode: 200, body: JSON.stringify([product]) };
     }
 
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };

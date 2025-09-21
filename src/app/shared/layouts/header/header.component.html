@@ -5,27 +5,57 @@
   <span class="brand" [routerLink]="['/']" style="cursor:pointer">{{'header.ecommerce' | translate}}</span>
   <span class="flex-spacer"></span>
 
-  <a mat-button routerLink="/" routerLinkActive="active">{{'header.home' | translate}}</a>
-  <a mat-button routerLink="/contact-us" routerLinkActive="active">{{'header.contact_us' | translate}}</a>
-  <a mat-button routerLink="/catalog" routerLinkActive="active">Catalog</a>
-  <a mat-icon-button routerLink="/cart" matBadge="{{cartCount}}" matBadgeColor="accent" aria-label="Cart">
-    <mat-icon>shopping_cart</mat-icon>
-  </a>
+  <!-- Desktop navigation -->
+  <div class="desktop-nav">
+    <a mat-button routerLink="/" routerLinkActive="active">{{'header.home' | translate}}</a>
+    <a mat-button routerLink="/contact-us" routerLinkActive="active">{{'header.contact_us' | translate}}</a>
+    <a mat-button routerLink="/catalog" routerLinkActive="active">Catalog</a>
+    <a mat-icon-button routerLink="/cart" matBadge="{{cartCount}}" matBadgeColor="accent" aria-label="Cart">
+      <mat-icon>shopping_cart</mat-icon>
+    </a>
 
-  <ng-container *ngIf="logged_in">
-    <span class="mr-2">Hi, {{displayName || 'User'}}</span>
-    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="user_role === 'admin'">
-      Admin <mat-icon>expand_more</mat-icon>
+    <ng-container *ngIf="logged_in">
+      <span class="mr-2 d-none d-sm-inline">Hi, {{displayName || 'User'}}</span>
+      <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="user_role === 'admin'">
+        Admin <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #adminMenu="matMenu">
+        <button mat-menu-item routerLink="/admin/catalog">Products</button>
+        <button mat-menu-item routerLink="/admin/users">Users</button>
+      </mat-menu>
+      <a mat-button routerLink="/my-profile">{{'header.my_profile' | translate}}</a>
+      <button mat-button (click)="logOut()">{{'header.signout' | translate}}</button>
+    </ng-container>
+    <ng-container *ngIf="!logged_in">
+      <a mat-button routerLink="/sign-in">{{'header.signin' | translate}}</a>
+      <a mat-button routerLink="/sign-up">{{'header.signup' | translate}}</a>
+    </ng-container>
+  </div>
+
+  <!-- Mobile navigation (hamburger) -->
+  <button mat-icon-button [matMenuTriggerFor]="mobileMenu" class="mobile-nav" aria-label="Menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #mobileMenu="matMenu">
+    <button mat-menu-item routerLink="/">{{'header.home' | translate}}</button>
+    <button mat-menu-item routerLink="/contact-us">{{'header.contact_us' | translate}}</button>
+    <button mat-menu-item routerLink="/catalog">Catalog</button>
+    <button mat-menu-item routerLink="/cart">
+      <mat-icon>shopping_cart</mat-icon>
+      <span class="ml-2">Cart ({{cartCount}})</span>
     </button>
-    <mat-menu #adminMenu="matMenu">
-      <button mat-menu-item routerLink="/admin/catalog">Products</button>
-      <button mat-menu-item routerLink="/admin/users">Users</button>
-    </mat-menu>
-    <a mat-button routerLink="/my-profile">{{'header.my_profile' | translate}}</a>
-    <button mat-button (click)="logOut()">{{'header.signout' | translate}}</button>
-  </ng-container>
-  <ng-container *ngIf="!logged_in">
-    <a mat-button routerLink="/sign-in">{{'header.signin' | translate}}</a>
-    <a mat-button routerLink="/sign-up">{{'header.signup' | translate}}</a>
-  </ng-container>
+    <ng-container *ngIf="logged_in; else guestLinks">
+      <button mat-menu-item routerLink="/my-profile">{{'header.my_profile' | translate}}</button>
+      <button mat-menu-item *ngIf="user_role === 'admin'" [matMenuTriggerFor]="mobileAdminMenu">Admin</button>
+      <button mat-menu-item (click)="logOut()">{{'header.signout' | translate}}</button>
+    </ng-container>
+    <ng-template #guestLinks>
+      <button mat-menu-item routerLink="/sign-in">{{'header.signin' | translate}}</button>
+      <button mat-menu-item routerLink="/sign-up">{{'header.signup' | translate}}</button>
+    </ng-template>
+  </mat-menu>
+  <mat-menu #mobileAdminMenu="matMenu">
+    <button mat-menu-item routerLink="/admin/catalog">Products</button>
+    <button mat-menu-item routerLink="/admin/users">Users</button>
+  </mat-menu>
 </mat-toolbar>

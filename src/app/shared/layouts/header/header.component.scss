@@ -1,3 +1,15 @@
 .flex-spacer{ flex: 1 1 auto; }
-.brand{ font-weight: 500; margin-left: 8px; }
+.brand{ font-weight: 500; margin-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 :host ::ng-deep .mat-badge-content{ font-size: 10px; }
+
+.desktop-nav{ display: flex; align-items: center; gap: 6px; }
+.mobile-nav{ display: none; }
+
+@media (max-width: 992px){
+  .brand{ max-width: 40vw; }
+}
+@media (max-width: 768px){
+  .desktop-nav{ display: none; }
+  .mobile-nav{ display: inline-flex; }
+  .brand{ max-width: 50vw; }
+}

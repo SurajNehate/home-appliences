@@ -35,7 +35,8 @@ export class HeaderComponent implements OnInit {
   }
 
   private loadProfile() {
-    this.http.get<any>('/.netlify/functions/profile').subscribe(
+    // Use direct DB-backed function to avoid Neon REST auth requirements
+    this.http.get<any>('/.netlify/functions/auth-direct').subscribe(
       res => { this.displayName = res && res.user ? res.user.name : ''; },
       _ => { this.displayName = ''; }
     );

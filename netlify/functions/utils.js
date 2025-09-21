@@ -13,12 +13,15 @@ function neonHeaders(extra = {}) {
     'Content-Type': 'application/json',
     ...extra,
   };
-  
-  // Use basic authentication - try multiple sources
-  if (NEON_BASIC_AUTH) {
+
+  // Priority: Bearer API key (preferred)
+  if (NEON_API_KEY) {
+    headers['Authorization'] = `Bearer ${NEON_API_KEY}`;
+  } else if (NEON_BASIC_AUTH) {
+    // Basic authentication via provided base64 credentials
     headers['Authorization'] = `Basic ${NEON_BASIC_AUTH}`;
   } else if (NETLIFY_DATABASE_URL) {
-    // Extract credentials from connection string
+    // Extract basic auth credentials from connection string if present
     try {
       const url = new URL(NETLIFY_DATABASE_URL);
       const username = url.username;
@@ -31,9 +34,8 @@ function neonHeaders(extra = {}) {
       console.error('Failed to parse database URL for auth:', err.message);
     }
   }
-  
-  // If no auth is set, this will likely fail - which is expected for security
-  
+
+  // PostgREST preference to return inserted/updated rows
   headers['Prefer'] = headers['Prefer'] || 'return=representation';
   return headers;
 }

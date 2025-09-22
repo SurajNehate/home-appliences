@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 
 async function getDbClient() {
+  const connectionString = process.env.NEON_DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
   const client = new Client({
-    connectionString: process.env.NETLIFY_DATABASE_URL,
+    connectionString,
     ssl: { rejectUnauthorized: false }
   });
   await client.connect();
@@ -98,7 +99,7 @@ exports.handler = async (event) => {
         return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
       }
 
-      // Hash password
+      // Hash password for users.password column
       const bcrypt = require('bcryptjs');
       const password_hash = bcrypt.hashSync(String(password), 10);
 

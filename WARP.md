@@ -2,151 +2,100 @@
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
-## Development Commands
+Project: Angular 19 application with optional SSR via @angular/ssr and an Express server. Deployed statically via Netlify by default.
 
-### Prerequisites
-- Node.js (install from https://nodejs.org/en/)
-- Angular CLI: `npm install -g @angular/cli`
-- JSON Server (for mock API): `npm install -g json-server`
+Commands you will commonly use
 
-### Setup
-```bash
-npm install
+- Install dependencies
+
+```bash path=null start=null
+npm ci
 ```
 
-### Development Server
-This application requires two servers running simultaneously:
+- Start dev server (CSR)
 
-**Terminal 1 (Angular dev server):**
-```bash
+```bash path=null start=null
 npm start
-# or: cross-env NODE_OPTIONS=--openssl-legacy-provider ng serve
 ```
 
-**Terminal 2 (Mock API server):**
-```bash
-json-server --watch mock-api-data.json
-```
+- Build (production by default)
 
-The application will be available at http://localhost:4200 and mock API at http://localhost:3000
-
-### Build and Testing
-```bash
-# Production build
+```bash path=null start=null
 npm run build
-# or: cross-env NODE_OPTIONS=--openssl-legacy-provider ng build
+```
 
-# Run unit tests
+- Continuous development build (watch, development config)
+
+```bash path=null start=null
+npm run watch
+```
+
+- Run unit tests (Karma + Jasmine)
+
+```bash path=null start=null
 npm test
-# or: ng test
-
-# Run end-to-end tests
-npm run e2e
-# or: ng e2e
-
-# Lint the code
-npm run lint
-# or: ng lint
 ```
 
-### Running Single Tests
-```bash
-# Run specific test file
-ng test --include="**/component-name.spec.ts"
+- Run a single spec file
 
-# Run tests in watch mode for specific component
-ng test --watch --include="**/cart.service.spec.ts"
+```bash path=null start=null
+npx ng test --include=src/path/to/your.spec.ts
 ```
 
-## Architecture Overview
+- Headless CI-style test run
 
-### Dual-Mode Application
-This codebase supports two deployment modes:
-
-1. **Full Ecommerce Mode**: Uses `mock-api-data.json` with JSON Server for complete user management with admin/member roles and order processing
-2. **Static Catalog Mode**: Uses `src/assets/products.json` for Netlify-compatible static deployment with guest cart and form submissions
-
-### Module Structure
-- **AppModule**: Main application module with all components declared (simplified from modular architecture)
-- **SharedModule**: Contains reusable components, services, and directives
-- **Core Services**: 
-  - `CatalogService`: Manages product data (static JSON or API)
-  - `CartService`: Browser localStorage-based cart for guest users
-  - `AuthGuardService`: Admin authentication for catalog management
-
-### Key Components
-- **Public Pages**: Home, Catalog (product list/detail), Cart, Checkout, Contact
-- **Admin Pages**: Login, Catalog Editor, User Management
-- **Shared Layouts**: Header, Footer, Page Not Found
-
-### Data Models
-- **Static Mode**: Products stored in `src/assets/products.json` with Google Drive image URLs
-- **Full Mode**: Users (admin/member roles), products, and orders in `mock-api-data.json`
-
-## Static Deployment (Netlify)
-
-### Product Management
-- Admin can edit catalog at `/admin/catalog` (login: admin@gmail.com / 123456)
-- Changes are in-memory only - use "Download JSON" to get updated `products.json`
-- Replace `src/assets/products.json` and redeploy to update live catalog
-
-### Image Handling
-Products use Google Drive public URLs in format:
-```
-https://drive.google.com/uc?export=view&id=<FILE_ID>
+```bash path=null start=null
+npx ng test --watch=false --browsers=ChromeHeadless
 ```
 
-### Form Submissions
-- Checkout and Contact forms submit to Netlify Forms
-- Hidden form registrations in `src/index.html`
-- Configure email notifications in Netlify dashboard
+- Build for SSR and serve with Node (Express)
 
-## Development Notes
-
-### Legacy OpenSSL Support
-This Angular 8 project requires legacy OpenSSL provider due to Node.js compatibility:
-```bash
-cross-env NODE_OPTIONS=--openssl-legacy-provider
+```bash path=null start=null
+npx ng build --ssr
+npm run serve:ssr:home-decor-v19
 ```
 
-### Environment Configuration
-- Development: `src/environments/environment.ts`
-- Production: `src/environments/environment.prod.ts`
-- Admin credentials and contact info configured in environment files
+- Serve SSR on a custom port (PowerShell)
 
-### Cart Implementation
-Guest cart uses browser localStorage with key `guest_cart_v1`. No server persistence required.
-
-### Translation Support
-Configured with `@ngx-translate` for internationalization, language files in `src/assets/i18n/`
-
-### Styling
-- Bootstrap 4.3.1 for UI framework
-- Font Awesome for icons
-- SCSS for component styles
-- Global styles in `src/styles.scss`
-
-### Testing Framework
-- Jasmine + Karma for unit tests
-- Protractor for e2e tests
-- TSLint for code quality (max line length: 140 chars)
-
-## Route Structure
-```
-/ - Home page
-/catalog - Product listing
-/catalog/:id - Product details
-/cart - Shopping cart
-/checkout-guest - Guest checkout with Netlify form
-/contact-us - Contact form
-/admin-login - Admin authentication
-/admin/catalog - Product catalog editor (requires admin login)
-/admin/users - User management (requires admin login)
+```bash path=null start=null
+$env:PORT=5000
+npm run serve:ssr:home-decor-v19
 ```
 
-## Admin Static Login
-Default credentials configured in `src/environments/environment.ts`:
-- Username: admin@gmail.com  
-- Password: 123456
+Notes on linting/formatting
 
-Change these before deployment to production.
+- No lint script or ESLint configuration is present in this repository.
+
+High-level architecture and structure
+
+- App type and build system
+  - Single-project Angular application configured via angular.json using the @angular-devkit/build-angular:application builder.
+  - Default outputPath is dist/home-decor-v19. outputMode is set to "static", which produces static output by default (suitable for Netlify).
+  - Global styles are authored in SCSS (src/styles.scss). Static assets are served from public/.
+
+- Entrypoints and bootstrapping
+  - Client bootstrap: src/main.ts bootstraps AppComponent with appConfig.
+  - Server bootstrap: src/main.server.ts bootstraps AppComponent with server-side config for SSR.
+
+- Server-side rendering (SSR)
+  - An Express server (src/server.ts) integrates @angular/ssr/node:
+    - Serves prebuilt static assets from dist/.../browser with long-term caching.
+    - Falls through to AngularNodeAppEngine to render routes on the server when enabled.
+    - Listens on process.env.PORT or defaults to 4000 when launched directly.
+    - Exported reqHandler supports integration with Angular CLI or serverless functions if desired.
+  - To produce the server bundle, build with the --ssr flag (see commands above), then run the provided npm script to start the Node server.
+
+- Testing
+  - Unit tests use Karma with Jasmine. The test target is defined in angular.json and includes src/**/*.spec.ts via tsconfig.spec.json.
+  - For test selection, prefer --include to run specific spec files. (Jasmine name filtering is not exposed via a CLI flag here.)
+
+- TypeScript configuration
+  - tsconfig.json enables strict mode with additional safety checks (noImplicitReturns, noFallthroughCasesInSwitch, etc.).
+  - Module/target are ES2022 with bundler-style resolution and isolatedModules enabled.
+
+- UI and runtime dependencies
+  - UI libraries include @angular/material and Bootstrap.
+  - Runtime server-side libraries are present (express, pg, bcryptjs, jsonwebtoken). They are not imported in client code; keep any usage within Node-only contexts (e.g., src/server.ts) to avoid bundling them into the browser build.
+
+- Deployment
+  - Netlify is configured via netlify.toml to run npm run build and publish dist/home-decor-v19. This aligns with the static (CSR/SSG) output. Dynamic Node SSR via Express is separate and not part of this Netlify config.

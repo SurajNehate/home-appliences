@@ -1,0 +1,24 @@
+<div class="wrap">
+  <mat-card>
+    <h2>Admin Login</h2>
+
+    <form [formGroup]="form" (ngSubmit)="login()" class="form">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" required>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Login</button>
+        <button mat-button type="button" (click)="signupAdmin()">Signup Admin</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+    </form>
+  </mat-card>
+</div>

@@ -1,58 +1,54 @@
-# Neon DB integration via Netlify Functions
+# Neon DB (direct) + Netlify Functions setup
 
-This project uses Netlify Functions to talk to Neon Postgres (REST/PostgREST) so that secrets stay on the server and not in the browser.
+This project uses Netlify Functions with the Neon serverless Postgres driver (@neondatabase/serverless) so that database access happens on the server. The Angular app talks only to 
+/.netlify/functions/* endpoints.
 
-## Deploy prerequisites
+## Prerequisites
 
-1) Create your database tables in Neon
+- A Neon Postgres database (connection string)
+- A JWT secret for admin auth
+- (Optional) Cloudinary account if you want server-side image uploads
 
-Run the SQL in `db/schema.sql` on your Neon database. You can use Neon Console, `psql`, or the REST SQL runner.
+## Required environment variables (Netlify → Site settings → Build & deploy → Environment)
 
-2) Configure environment variables in Netlify
-
-Add these to your site’s Environment Variables (Site settings → Build & deploy → Environment → Environment variables):
-
-- `NEON_REST_URL` = https://ep-soft-waterfall-aelrt553.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1
-- Choose ONE of the following auth setups:
-  - `NEON_API_KEY` = <your Neon REST API key> (preferred: Authorization: Bearer)
-  - OR `NEON_BASIC_AUTH` = <base64(username:password)> for basic auth
-- `JWT_SECRET` = <a strong random string> (for issuing login tokens)
-- (optional) `JWT_EXPIRES_IN` = `7d` (default)
+- NEON_DATABASE_URL = postgres://user:password@host/db?sslmode=require
+- JWT_SECRET = a strong secret string
+- (Optional) CLOUDINARY_URL = cloudinary://<api_key>:<api_secret>@<cloud_name>
 
 Do NOT commit secrets to the repo.
 
-3) Functions
+## Functions
 
-- Functions are under `netlify/functions`:
-  - `products.js` → CRUD for products table
-  - `users.js` → CRUD for users table
+- /.netlify/functions/auth-direct → signup/login/current-user (direct Neon)
+- /.netlify/functions/products-direct → CRUD for products (direct Neon)
+- /.netlify/functions/orders-direct → create and list orders (admin auth required for GET)
+- /.netlify/functions/image-upload → upload images to Cloudinary and update product image fields
+- Utility (optional, for local/demo data):
+  - /.netlify/functions/setup-test-data
+  - /.netlify/functions/update-schema
 
-4) Frontend services
+## Database schema (created on-demand)
 
-- Products and Users services now call `/.netlify/functions/*` instead of static JSON files.
+Tables are created automatically on first call if they do not exist:
+- users(id, name, email unique, password_hash, role, created_at)
+- products(id, name, price, category, description, status, image_url, images[], created_at, updated_at)
+- orders(id, user_id, name, email, address, phone, items jsonb, total, created_at)
 
 ## Local development
 
-- `npm install`
-- `npm start`
+- npm install
+- To run Angular only: npm start (http://localhost:4200)
+- To run Angular + Netlify Functions together (recommended): npm run dev:netlify
+  - This proxies /.netlify/functions/* to local function handlers
 
-(Optional) To run Netlify Dev locally so functions are proxied:
-- `npm install -g netlify-cli`
-- `netlify dev` (will run Angular and functions together)
+## Deployment (Netlify)
 
-## SQL schema overview
-
-Products table:
-- id, name, price, image_url, images (JSON array of URLs), category, description, status, created_at
-
-Users table:
-- id, name, email (unique), password (store hash in production), phone, role, created_at
-
-Optional table:
-- product_images (normalized) — use if you prefer images separate from products
+- netlify.toml already points publish to dist/home-decor-v19 and functions to netlify/functions
+- Ensure env vars are set on your Netlify site
+- Push to your Git remote; Netlify will build and deploy
 
 ## Notes
 
-- Image binaries are not stored in DB; only URLs. Host your images under `/assets/images` or external storage/CDN and put the URLs into `image_url` and `images[]`.
-- The admin UI now saves products directly to the database. JSON download is no longer needed.
-- For secure authentication, replace the simple password field with a hashed password and server-side auth flow.
+- Admin-only actions require Bearer token from auth-direct responses.
+- Frontend services call server endpoints; no DB credentials are exposed in the browser.
+- If migrating from the older project, prefer the new direct Neon TypeScript functions (*-direct.ts). Older JS helpers were updated to also accept NEON_DATABASE_URL.

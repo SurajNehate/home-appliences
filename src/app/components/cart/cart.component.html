@@ -1,0 +1,69 @@
+<div class="wrap">
+  <mat-card>
+    <h2 class="title">Your Cart</h2>
+
+    <table mat-table [dataSource]="(items$ | async) || []" class="mat-elevation-z1">
+      <!-- Image -->
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          <img [src]="item.imageUrl || 'https://picsum.photos/seed/' + item.id + '/100/100'" [alt]="item.name">
+        </td>
+      </ng-container>
+
+      <!-- Name -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Product </th>
+        <td mat-cell *matCellDef="let item"> {{item.name}} </td>
+      </ng-container>
+
+      <!-- Price -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef> Price </th>
+        <td mat-cell *matCellDef="let item"> ₹ {{item.price | number:'1.0-2'}} </td>
+      </ng-container>
+
+      <!-- Qty -->
+      <ng-container matColumnDef="qty">
+        <th mat-header-cell *matHeaderCellDef> Qty </th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-icon-button (click)="dec(item.id)"><span class="material-symbols-outlined">remove</span></button>
+          <span class="qty">{{item.qty}}</span>
+          <button mat-icon-button (click)="inc(item.id)"><span class="material-symbols-outlined">add</span></button>
+        </td>
+      </ng-container>
+
+      <!-- Total -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef> Total </th>
+        <td mat-cell *matCellDef="let item"> ₹ {{(item.price * item.qty) | number:'1.0-2'}} </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-button color="warn" (click)="remove(item.id)">
+            <span class="material-symbols-outlined">delete</span>&nbsp;Remove
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="footer" *ngIf="items$ | async as items">
+      <div class="left">
+        <a mat-stroked-button color="primary" [routerLink]="['/products']">
+          <span class="material-symbols-outlined">arrow_back</span>&nbsp;Continue Shopping
+        </a>
+      </div>
+      <div class="right">
+        <div class="sum">Subtotal: <strong>₹ {{ cart.total | number:'1.0-2' }}</strong></div>
+        <a mat-flat-button color="primary" [routerLink]="['/checkout-guest']" [class.mat-disabled]="items.length === 0" [attr.aria-disabled]="items.length === 0">Checkout</a>
+        <button mat-button color="warn" (click)="clear()" [disabled]="items.length === 0">Clear</button>
+      </div>
+    </div>
+  </mat-card>
+</div>

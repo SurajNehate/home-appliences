@@ -1,0 +1,36 @@
+<div class="wrap">
+  <mat-card>
+    <h2>Guest Checkout</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" required>
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Address</mat-label>
+        <textarea matInput rows="3" formControlName="address" required></textarea>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Phone</mat-label>
+        <input matInput formControlName="phone" required>
+      </mat-form-field>
+
+      <div class="summary">
+        <div>Items in cart: {{ (cart.items$ | async)?.length || 0 }}</div>
+        <div>Subtotal: <strong>₹ {{ cart.total | number:'1.0-2' }}</strong></div>
+      </div>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || (cart.total === 0)">Submit Order</button>
+        <a mat-stroked-button color="primary" [routerLink]="['/cart']">Back to Cart</a>
+      </div>
+    </form>
+  </mat-card>
+</div>

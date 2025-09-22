@@ -1,25 +1,19 @@
-@import '~@angular/material/theming';
+@use '@angular/material' as mat;
 
-// Typography config for v8
-$custom-typography: mat-typography-config(
-  $font-family: 'Roboto, Arial, sans-serif'
-);
-@include mat-core($custom-typography);
+/* Minimal Material 3 theme using Angular Material v19 API */
+$light-theme: mat.define-theme((
+  color: (theme-type: light),
+));
 
-// Palettes (v8 API)
-$primary: mat-palette($mat-indigo);
-$accent: mat-palette($mat-pink, A200, A100, A400);
-$warn: mat-palette($mat-red);
+$dark-theme: mat.define-theme((
+  color: (theme-type: dark),
+));
 
-// Theme (v8 API)
-$home-decor-theme: mat-light-theme($primary, $accent, $warn);
-@include angular-material-theme($home-decor-theme);
-@include angular-material-typography($custom-typography);
+:root { @include mat.all-component-themes($light-theme); }
 
-// Global adjustments
-.mat-toolbar.mat-primary {
-  background: mat-color($primary, 600);
-}
+/* Optional manual toggle for dark mode: add `theme-dark` class on <body> or <html> */
+.theme-dark  { @include mat.all-component-colors($dark-theme); }
 
-// Utility
+/* Utilities */
 .w-100 { width: 100%; }
+.sim-pointer { cursor: pointer; }

@@ -1,0 +1,5 @@
+ .wrap { display: grid; gap: 1rem; }
+ .form { display: grid; gap: 1rem; }
+ .row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+ .summary { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+ .actions { display: flex; gap: 0.75rem; }

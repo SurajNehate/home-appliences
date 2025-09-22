@@ -1,0 +1,26 @@
+<div class="wrap">
+  <mat-card>
+    <h2>My Profile</h2>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Phone</mat-label>
+        <input matInput formControlName="phone">
+      </mat-form-field>
+
+      <div style="color:#b00020" *ngIf="error">{{ error }}</div>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+    </form>
+  </mat-card>
+</div>

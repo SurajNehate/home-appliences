@@ -1,0 +1,26 @@
+<div class="grid" *ngIf="products$ | async as products">
+  <mat-card class="card" *ngFor="let p of products; trackBy: trackById" (click)="goTo(p)">
+    <img mat-card-image [src]="p.imageUrl || 'https://picsum.photos/seed/' + p.id + '/600/400'" [alt]="p.name">
+    <mat-card-header>
+      <mat-card-title>{{ p.name }}</mat-card-title>
+      <mat-card-subtitle>{{ p.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="price">₹ {{ p.price | number:'1.0-2' }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="add(p); $event.stopPropagation()">
+        <span class="material-symbols-outlined">add_shopping_cart</span>&nbsp;Add
+      </button>
+      <a *ngIf="auth.isAdmin()" mat-stroked-button color="accent" [routerLink]="['/products/edit', p.id]" (click)="$event.stopPropagation()">
+        <span class="material-symbols-outlined">edit</span>&nbsp;Edit
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<div class="actions" *ngIf="auth.isAdmin()">
+  <a mat-fab color="accent" [routerLink]="['/products/add']" aria-label="Add product">
+    <span class="material-symbols-outlined">add</span>
+  </a>
+</div>

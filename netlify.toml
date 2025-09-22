@@ -1,14 +1,12 @@
 [build]
   command = "npm run build"
-  publish = "dist/angular-ecommerce"
+  publish = "dist/home-decor-v19"
   functions = "netlify/functions"
 
 [dev]
-  command = "npm run start:http"
-  # Port for Netlify Dev (proxy server)
-  port = 8888
-  # Port your Angular dev server runs on
-  targetPort = 4200
+  command = "npm start"
+  port = 8888         # Netlify Dev proxy server
+  targetPort = 4200   # Angular dev server used by `npm start`
 
 [functions]
   node_bundler = "esbuild"

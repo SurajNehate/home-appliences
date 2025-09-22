@@ -1,0 +1,28 @@
+.app-shell {
+  height: 100vh;
+}
+
+.app-toolbar .title {
+  font-weight: 500;
+}
+
+.app-sidenav {
+  width: 260px;
+  padding: 0.5rem 0.25rem;
+}
+
+.sidenav-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+}
+
+.app-content {
+  padding: 1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

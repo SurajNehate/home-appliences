@@ -1,0 +1,56 @@
+<ng-container *ngIf="current as p">
+  <mat-card class="detail">
+    <div class="viewer">
+      <div class="thumbs" *ngIf="images.length > 1">
+        <img *ngFor="let url of images; let i = index; trackBy: trackByUrl"
+             [src]="url"
+             [alt]="p.name"
+             [class.selected]="i === selectedIndex"
+             (click)="selectImage(i)" />
+      </div>
+      <div class="main">
+        <img [src]="images[selectedIndex]" [alt]="p.name" (click)="openLightbox()">
+      </div>
+    </div>
+
+    <mat-card-header>
+      <mat-card-title>{{ p.name }}</mat-card-title>
+      <mat-card-subtitle>{{ p.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ p.description }}</p>
+      <p class="price">₹ {{ p.price | number:'1.0-2' }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="add(p)">
+        <span class="material-symbols-outlined">add_shopping_cart</span>&nbsp;Add to cart
+      </button>
+      <a mat-stroked-button [routerLink]="['/products']">
+        <span class="material-symbols-outlined">arrow_back</span>&nbsp;Back
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>
+
+<!-- Lightbox for full-screen image with pinch-zoom and pan -->
+<div class="lightbox" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <div #inner class="lightbox-inner"
+       (click)="$event.stopPropagation()"
+       (wheel)="onWheel($event)"
+       (pointerdown)="onPointerDown($event)"
+       (pointermove)="onPointerMove($event)"
+       (pointerup)="onPointerUp($event)"
+       (pointercancel)="onPointerUp($event)"
+       (pointerleave)="onPointerUp($event)"
+       [style.cursor]="isPanning ? 'grabbing' : (scale > 1 ? 'grab' : 'zoom-in')">
+    <img #imgEl [src]="images[selectedIndex]"
+         [alt]="current?.name"
+         [style.transform]="transform"
+         [style.transition]="isPanning || isPinching ? 'none' : 'transform 120ms ease'"
+         (load)="onImageLoad()"
+         draggable="false" />
+  </div>
+  <button class="close" (click)="closeLightbox()" aria-label="Close">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+</div>

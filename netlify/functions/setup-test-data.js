@@ -3,8 +3,9 @@ const { Client } = require('pg');
 const bcrypt = require('bcryptjs');
 
 async function getDbClient() {
+  const connectionString = process.env.NEON_DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
   const client = new Client({
-    connectionString: process.env.NETLIFY_DATABASE_URL,
+    connectionString,
     ssl: { rejectUnauthorized: false }
   });
   await client.connect();

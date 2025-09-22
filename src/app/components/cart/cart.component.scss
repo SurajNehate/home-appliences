@@ -1,0 +1,5 @@
+ .wrap { display: grid; gap: 1rem; }
+ table { width: 100%; }
+ td img { width: 64px; height: 64px; object-fit: cover; border-radius: 4px; }
+ .qty { display: inline-block; width: 36px; text-align: center; }
+ .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }

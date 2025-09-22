@@ -1,29 +1,52 @@
-import { Component, HostListener } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { DOCUMENT, CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from './services/auth.service';
+import { CartService } from './services/cart.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  private readonly document = inject(DOCUMENT);
+  dark = false;
 
-  title = 'angular-ecommerce';
+  constructor(public auth: AuthService, public cart: CartService) {}
 
-  screenHeight: any;
-  screenWidth: any;
-  footerMaxHeight: number;
-
-  constructor(private translate: TranslateService) {
-    translate.setDefaultLang('en');
-    this.getScreenSize();
+  toggleTheme(): void {
+    this.dark = !this.dark;
+    const body = this.document.body;
+    if (this.dark) {
+      body.classList.add('theme-dark');
+      body.classList.remove('theme-light');
+    } else {
+      body.classList.add('theme-light');
+      body.classList.remove('theme-dark');
+    }
   }
 
-  @HostListener('window:resize', ['$event'])
-  getScreenSize(event?) {
-    this.screenHeight = window.innerHeight;
-    this.screenWidth = window.innerWidth;
-    // console.log(this.screenHeight, this.screenWidth);
-    this.footerMaxHeight = this.screenHeight - 130;//header and footer aprox
+  isLoggedIn(): boolean { return this.auth.isLoggedIn(); }
+  isAdmin(): boolean { return this.auth.isAdmin(); }
+  logout() { this.auth.logout(); }
+  get cartCount(): number {
+    try { return (this.cart as any).itemsSubject.value.reduce((s: number, i: any) => s + (Number(i.qty)||0), 0); } catch { return 0; }
   }
 }

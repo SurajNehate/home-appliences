@@ -13,6 +13,7 @@
             <tr>
               <th>ID</th>
               <th>Customer</th>
+              <th>Contact</th>
               <th>Total</th>
               <th>Status</th>
               <th>Created</th>
@@ -21,24 +22,26 @@
           </thead>
           <tbody>
             <ng-container *ngFor="let o of orders">
-              <!-- Summary row -->
               <tr>
                 <td>{{o.id}}</td>
                 <td>
                   <div>{{o.customer_name}}</div>
                   <div class="text-muted" *ngIf="o.customer_address">{{o.customer_address}}</div>
                 </td>
+                <td>
+                  <div *ngIf="o.customer_email">{{o.customer_email}}</div>
+                  <div *ngIf="o.customer_phone">{{o.customer_phone}}</div>
+                </td>
                 <td>₹ {{o.total}}</td>
                 <td>{{o.status}}</td>
                 <td>{{o.created_at | date:'short'}}</td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary mr-1" (click)="toggle(o.id)">{{expanded[o.id] ? 'Hide Contact' : 'View Contact'}}</button>
+                  <button class="btn btn-sm btn-outline-primary mr-1" (click)="toggle(o.id)">{{expanded[o.id] ? 'Hide' : 'View'}}</button>
                   <button class="btn btn-sm btn-outline-danger" (click)="delete(o.id)">Delete</button>
                 </td>
               </tr>
-              <!-- Items always visible -->
-              <tr>
-                <td colspan="6">
+              <tr *ngIf="expanded[o.id]">
+                <td colspan="7">
                   <div class="table-responsive">
                     <table class="table table-sm mb-0">
                       <thead>
@@ -59,16 +62,6 @@
                       </tbody>
                     </table>
                   </div>
-                </td>
-              </tr>
-              <!-- Contact details toggle -->
-              <tr *ngIf="expanded[o.id]">
-                <td colspan="6">
-                  <div class="mb-1 font-weight-bold">Contact</div>
-                  <div>{{o.customer_name}}</div>
-                  <div class="text-muted" *ngIf="o.customer_address">{{o.customer_address}}</div>
-                  <div *ngIf="o.customer_email">{{o.customer_email}}</div>
-                  <div *ngIf="o.customer_phone">{{o.customer_phone}}</div>
                 </td>
               </tr>
             </ng-container>

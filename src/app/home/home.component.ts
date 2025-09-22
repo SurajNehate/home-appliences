@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CatalogService, CatalogProduct } from '../shared/services/catalog.service';
 
@@ -12,8 +12,6 @@ export class HomeComponent implements OnInit {
   categories: string[] = [];
   activeCategory: string = 'All';
   searchTerm: string = '';
-  isHandset = false;
-  sidenavOpened = false;
 
   constructor(private router: Router, private catalog: CatalogService) { }
 
@@ -22,28 +20,7 @@ export class HomeComponent implements OnInit {
       this.products = list;
       this.categories = Array.from(new Set(list.map(p => p.category)));
     });
-    this.updateViewportFlags();
   }
-
-  @HostListener('window:resize')
-  onResize() { this.updateViewportFlags(); }
-
-  private updateViewportFlags() {
-    this.isHandset = window.innerWidth < 768;
-    if (!this.isHandset) {
-      this.sidenavOpened = true;
-    }
-  }
-
-  goToCategory(cat: string) {
-    this.activeCategory = cat;
-    // Smooth scroll to products section
-    const el = document.getElementById('home-products');
-    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    if (this.isHandset) { this.sidenavOpened = false; }
-  }
-
-  toggleSidenav() { this.sidenavOpened = !this.sidenavOpened; }
 
   filtered(): CatalogProduct[] {
     const term = (this.searchTerm || '').toLowerCase();

@@ -2,7 +2,7 @@
   <h2>Checkout</h2>
   <div *ngIf="submitted" class="alert alert-success">Thank you! Your order has been placed. You will receive a confirmation shortly.</div>
 
-  <form (ngSubmit)="submit()" *ngIf="!submitted">
+  <form (ngSubmit)="submit()" #f="ngForm" *ngIf="!submitted">
     <div class="form-group">
       <label>Name</label>
       <input class="form-control" name="name" [(ngModel)]="form.name" required>
@@ -19,6 +19,6 @@
       <label>Address</label>
       <textarea class="form-control" rows="4" name="address" [(ngModel)]="form.address" required></textarea>
     </div>
-    <button class="btn btn-primary" [disabled]="submitting">Submit Order</button>
+    <button class="btn btn-primary" [disabled]="submitting || f.invalid">Submit Order</button>
   </form>
 </div>

@@ -23,8 +23,19 @@ export class CheckoutGuestComponent {
   async submit() {
     this.submitting = true;
     try {
+      const { name, email, phone, address } = this.form;
+      if (!name || !email || !phone || !address) {
+        this.toastr.error('Please fill in all required fields', 'Checkout');
+        this.submitting = false;
+        return;
+      }
       const items = this.cart.getItems().map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, imageUrl: i.imageUrl }));
-      const customer = { name: this.form.name, email: this.form.email, phone: this.form.phone, address: this.form.address };
+      if (!items.length) {
+        this.toastr.error('Your cart is empty', 'Checkout');
+        this.submitting = false;
+        return;
+      }
+      const customer = { name, email, phone, address };
       await this.http.post('/.netlify/functions/orders-direct', { customer, items }).toPromise();
       this.submitted = true;
       this.toastr.success('Order placed successfully!', 'Thank you');

@@ -33,23 +33,25 @@
       <span>Users ({{users.length}})</span>
     </div>
     <div class="card-body">
-      <table class="table table-sm table-bordered">
-        <thead>
-          <tr>
-            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of users">
-            <td>{{u.id}}</td>
-            <td>{{u.name}}</td>
-            <td>{{u.email}}</td>
-            <td>{{u.phone}}</td>
-            <td>{{u.role}}</td>
-            <td><button class="btn btn-sm btn-danger" (click)="deleteUser(u.id)">Delete</button></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+          <thead>
+            <tr>
+              <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of users">
+              <td>{{u.id}}</td>
+              <td>{{u.name}}</td>
+              <td>{{u.email}}</td>
+              <td>{{u.phone}}</td>
+              <td>{{u.role}}</td>
+              <td><button class="btn btn-sm btn-danger" (click)="deleteUser(u.id)">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

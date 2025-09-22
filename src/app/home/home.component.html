@@ -5,8 +5,8 @@
       <div class="d-flex align-items-center">
         <mat-form-field appearance="fill" class="mr-0 mr-md-3 mb-2 mb-md-0 cat-field">
           <mat-label>Category</mat-label>
-          <mat-select [(value)]="activeCategory">
-            <mat-option [value]="'All'">All</mat-option>
+          <mat-select [(ngModel)]="activeCategory">
+            <mat-option value="All">All</mat-option>
             <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
           </mat-select>
         </mat-form-field>

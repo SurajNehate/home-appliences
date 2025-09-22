@@ -24,6 +24,15 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Environment files (local only)
+.env
+.env.*
+!.env.example
+
+# Netlify local state
+.netlify
+.netlify-cli
+
 # misc
 /.sass-cache
 /connect.lock

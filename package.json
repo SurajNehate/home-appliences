@@ -4,10 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng serve",
+    "start:http": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng serve --ssl false",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "dev:netlify": "npx netlify-cli dev"
   },
   "private": true,
   "dependencies": {

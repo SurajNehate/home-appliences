@@ -4,8 +4,11 @@
   functions = "netlify/functions"
 
 [dev]
-  command = "npm start"
-  port = 4200
+  command = "npm run start:http"
+  # Port for Netlify Dev (proxy server)
+  port = 8888
+  # Port your Angular dev server runs on
+  targetPort = 4200
 
 [functions]
   node_bundler = "esbuild"

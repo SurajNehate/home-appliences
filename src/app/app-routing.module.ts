@@ -17,8 +17,7 @@ import { OrdersAdminComponent } from './admin/orders-admin/orders-admin.componen
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
-  // Public catalog and cart routes (no login required)
-  { path: 'catalog', component: ProductListComponent },
+  // Public product details and cart routes (no list page)
   { path: 'catalog/:id', component: ProductDetailComponent },
   { path: 'cart', component: CartComponent },
   { path: 'checkout-guest', component: CheckoutGuestComponent },

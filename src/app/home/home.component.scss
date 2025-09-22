@@ -10,6 +10,11 @@
 .home-sidenav-container{ min-height: 60vh; }
 .home-sidenav{ width: 260px; }
 
+/* Tighten container on desktop to make sidenav feel left-aligned to window */
+@media (min-width: 768px){
+  .home-sidenav-container .mat-sidenav-content { padding-left: 0 !important; }
+}
+
 /* Product cards hover */
 .product-card{ transition: transform .15s ease, box-shadow .15s ease; }
 .product-card:hover{ transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }

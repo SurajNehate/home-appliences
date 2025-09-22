@@ -9,7 +9,6 @@
   <div class="desktop-nav">
     <a mat-button routerLink="/" routerLinkActive="active">{{'header.home' | translate}}</a>
     <a mat-button routerLink="/contact-us" routerLinkActive="active">{{'header.contact_us' | translate}}</a>
-    <a mat-button routerLink="/catalog" routerLinkActive="active">Catalog</a>
     <a mat-icon-button routerLink="/cart" matBadge="{{cartCount}}" matBadgeColor="accent" aria-label="Cart">
       <mat-icon>shopping_cart</mat-icon>
     </a>
@@ -40,7 +39,6 @@
   <mat-menu #mobileMenu="matMenu">
     <button mat-menu-item routerLink="/">{{'header.home' | translate}}</button>
     <button mat-menu-item routerLink="/contact-us">{{'header.contact_us' | translate}}</button>
-    <button mat-menu-item routerLink="/catalog">Catalog</button>
     <button mat-menu-item routerLink="/cart">
       <mat-icon>shopping_cart</mat-icon>
       <span class="ml-2">Cart ({{cartCount}})</span>

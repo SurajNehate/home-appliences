@@ -16,7 +16,7 @@
           <div class="text-muted p-2" *ngIf="categories.length === 0">No categories yet</div>
         </mat-nav-list>
         <mat-divider class="my-2"></mat-divider>
-        <mat-form-field appearance="outline" class="w-100">
+        <mat-form-field appearance="outline" class="w-100 d-md-none">
           <mat-label>Search products</mat-label>
           <input matInput [(ngModel)]="searchTerm">
           <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm=''" aria-label="Clear">
@@ -28,7 +28,17 @@
 
     <mat-sidenav-content>
       <div class="container-fluid">
-        <h3 id="home-products" class="mt-3 mb-3">{{ activeCategory === 'All' ? 'All Products' : activeCategory }}</h3>
+        <!-- Desktop top bar: categories already on the left via sidenav; put search to the right -->
+        <div class="d-none d-md-flex justify-content-end align-items-center pt-3 pr-3">
+          <mat-form-field appearance="outline" style="width: 340px; max-width: 50vw;">
+            <mat-label>Search products</mat-label>
+            <input matInput [(ngModel)]="searchTerm" placeholder="Search products...">
+            <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm=''" aria-label="Clear">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+        <h3 id="home-products" class="mt-2 mb-3">{{ activeCategory === 'All' ? 'All Products' : activeCategory }}</h3>
         <div class="row">
           <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let p of filtered()">
             <mat-card class="product-card h-100 sim-pointer" matRipple (click)="viewProduct(p.id)">

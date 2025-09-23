@@ -1,10 +1,21 @@
 .filters {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
   margin-bottom: 12px;
 }
-.filters .search { flex: 1 1 240px; min-width: 240px; }
+.filters .category { min-width: 160px; }
+.search-toggle { margin-left: 4px; }
+/* Collapsible search container */
+.search-wrap {
+  overflow: hidden;
+  max-width: 0;
+  transition: max-width 180ms ease;
+  flex: 1 1 0;
+}
+.search-wrap.open { max-width: 520px; }
+.filters .search { width: 100%; min-width: 200px; }
 
 .grid {
   display: grid;
@@ -30,5 +41,6 @@
 
 @media (max-width: 600px) {
   .filters { gap: 8px; }
-  .filters .search { flex-basis: 100%; min-width: 0; }
+  .filters .category { flex: 1 1 180px; }
+  .search-wrap.open { max-width: 100%; }
 }

@@ -1,15 +1,22 @@
 <div class="filters" *ngIf="categories$ | async as categories">
-  <mat-form-field appearance="outline">
+  <mat-form-field class="category" appearance="outline">
     <mat-label>Category</mat-label>
     <mat-select [formControl]="fcCategory">
       <mat-option value="all">All</mat-option>
       <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field class="search" appearance="outline">
-    <mat-label>Search</mat-label>
-    <input matInput placeholder="Search products" [formControl]="fcSearch" />
-  </mat-form-field>
+
+  <button mat-icon-button class="search-toggle" (click)="toggleSearch()" aria-label="Toggle search">
+    <span class="material-symbols-outlined">search</span>
+  </button>
+
+  <div class="search-wrap" [class.open]="showSearch">
+    <mat-form-field class="search" appearance="outline">
+      <mat-label>Search</mat-label>
+      <input #searchInput matInput placeholder="Search products" [formControl]="fcSearch" />
+    </mat-form-field>
+  </div>
 </div>
 
 <div class="grid" *ngIf="filtered$ | async as products">

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Observable, combineLatest, map, startWith } from 'rxjs';
@@ -37,6 +37,9 @@ export class ProductListComponent {
   fcCategory = new FormControl<string>('all', { nonNullable: true });
   fcSearch = new FormControl<string>('', { nonNullable: true });
 
+  showSearch = false;
+  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+
   filtered$!: Observable<Product[]>;
 
   constructor(private products: ProductService, private cart: CartService, private router: Router, public auth: AuthService) {}
@@ -65,6 +68,16 @@ export class ProductListComponent {
   }
 
   trackById(_i: number, p: Product) { return p.id; }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (this.showSearch) {
+      setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
+    } else {
+      // Optional: clear search when closing
+      // this.fcSearch.setValue('');
+    }
+  }
 
   add(p: Product) {
     this.cart.addItem(p, 1);

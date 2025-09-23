@@ -1,3 +1,11 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.filters .search { flex: 1 1 240px; min-width: 240px; }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -18,4 +26,9 @@
   position: fixed;
   right: 24px;
   bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .filters { gap: 8px; }
+  .filters .search { flex-basis: 100%; min-width: 0; }
 }

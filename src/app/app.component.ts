@@ -35,8 +35,9 @@ export class AppComponent {
   isHandset = false;
 
   constructor(public auth: AuthService, public cart: CartService) {
-    // Update handset flag on breakpoint changes
-    this.bo.observe([Breakpoints.Handset]).subscribe(r => this.isHandset = r.matches);
+    // Treat small tablets like phones for the sidenav: collapse on Handset and TabletPortrait
+    this.bo.observe([Breakpoints.Handset, Breakpoints.TabletPortrait])
+      .subscribe(r => this.isHandset = r.matches);
   }
 
   toggleTheme(): void {

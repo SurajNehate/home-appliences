@@ -12,6 +12,7 @@ import { AdminUsersComponent } from './components/admin-users/admin-users.compon
 import { SignupComponent } from './components/signup/signup.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { adminGuard } from './guards/admin.guard';
+import { cartNotEmptyGuard } from './guards/cart-not-empty.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
@@ -20,7 +21,7 @@ export const routes: Routes = [
   { path: 'products/edit/:id', component: ProductFormComponent },
   { path: 'products/:id', component: ProductDetailComponent },
   { path: 'cart', component: CartComponent },
-  { path: 'checkout-guest', component: CheckoutGuestComponent },
+  { path: 'checkout-guest', component: CheckoutGuestComponent, canActivate: [cartNotEmptyGuard] },
   { path: 'contact-us', component: ContactUsComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent },

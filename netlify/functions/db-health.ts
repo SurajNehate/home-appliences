@@ -2,7 +2,11 @@ import type { Handler } from '@netlify/functions';
 import { neon } from '@neondatabase/serverless';
 
 export const handler: Handler = async () => {
-  const connStr = process.env.NEON_DATABASE_URL;
+  const connStr =
+    process.env.NETLIFY_DATABASE_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    process.env.NETLIFY_DATABASE_URL_UNPOOLED;
   if (!connStr) {
     return {
       statusCode: 500,

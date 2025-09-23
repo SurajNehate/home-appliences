@@ -7,7 +7,11 @@ const ok = (body: unknown, statusCode = 200) => ({ statusCode, body: JSON.string
 const bad = (message: string, statusCode = 400) => ({ statusCode, body: JSON.stringify({ error: message }) });
 
 const getSql = () => {
-  const connStr = process.env.NEON_DATABASE_URL;
+  const connStr =
+    process.env.NETLIFY_DATABASE_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    process.env.NETLIFY_DATABASE_URL_UNPOOLED;
   if (!connStr) throw new Error('NEON_DATABASE_URL_NOT_SET');
   return neon(connStr);
 };

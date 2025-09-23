@@ -9,7 +9,11 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, body: 'IMAGE_ID_REQUIRED' };
     }
 
-    const connStr = process.env.NEON_DATABASE_URL;
+    const connStr =
+      process.env.NETLIFY_DATABASE_URL ||
+      process.env.NEON_DATABASE_URL ||
+      process.env.DATABASE_URL ||
+      process.env.NETLIFY_DATABASE_URL_UNPOOLED;
     if (!connStr) {
       return { statusCode: 500, body: 'NEON_DATABASE_URL_NOT_SET' };
     }

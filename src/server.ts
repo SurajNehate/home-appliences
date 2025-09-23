@@ -20,7 +20,11 @@ const angularApp = new AngularNodeAppEngine();
  * Requires NEON_DATABASE_URL env var (e.g., postgresql://... with sslmode=require).
  */
 app.get('/api/health/db', async (_req, res) => {
-  const connStr = process.env['NEON_DATABASE_URL'];
+  const connStr =
+    process.env['NETLIFY_DATABASE_URL'] ||
+    process.env['NEON_DATABASE_URL'] ||
+    process.env['DATABASE_URL'] ||
+    process.env['NETLIFY_DATABASE_URL_UNPOOLED'];
   if (!connStr) {
     return res.status(500).json({ ok: false, error: 'NEON_DATABASE_URL_NOT_SET' });
   }

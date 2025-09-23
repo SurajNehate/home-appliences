@@ -6,12 +6,9 @@
   font-weight: 500;
 }
 
-/* Make navigation area use the secondary (amber) container color in the current theme */
 .app-sidenav {
   width: 260px;
   padding: 0.5rem 0.25rem;
-  background-color: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
 }
 
 .sidenav-header {
@@ -20,13 +17,6 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   font-weight: 500;
-  background-color: var(--md-sys-color-secondary);
-  color: var(--md-sys-color-on-secondary);
-}
-
-/* List item hover/active accents using secondary */
-:where(.mat-mdc-nav-list) a.mat-mdc-list-item:hover {
-  background-color: color-mix(in srgb, var(--md-sys-color-secondary) 12%, transparent);
 }
 
 .app-content {

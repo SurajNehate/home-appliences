@@ -1,6 +1,8 @@
 [build]
   command = "npm run build"
-  publish = "dist/home-decor-v19"
+  # Angular's application builder outputs to a nested "browser" directory
+  # e.g. dist/home-decor-v19/browser
+  publish = "dist/home-decor-v19/browser"
   functions = "netlify/functions"
 
 [dev]
@@ -10,3 +12,9 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# SPA fallback so client-side routes (e.g. /products/123) serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

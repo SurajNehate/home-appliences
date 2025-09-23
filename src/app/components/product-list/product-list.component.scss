@@ -4,7 +4,14 @@
   gap: 1rem;
 }
 
-.card img { object-fit: cover; height: 180px; }
+/* Show full image inside fixed block with black letterbox/pillarbox */
+.card img {
+  height: 180px;
+  width: 100%;
+  object-fit: contain;
+  object-position: center center;
+  background: #000;
+}
 .price { font-weight: 600; margin-top: 0.5rem; }
 
 .actions {

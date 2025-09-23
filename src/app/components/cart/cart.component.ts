@@ -7,6 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-cart',
@@ -19,11 +20,14 @@ export class CartComponent {
   items$!: Observable<CartItem[]>;
 
   displayedColumns = ['image', 'name', 'price', 'qty', 'total', 'actions'];
+  isHandset = false;
 
-  constructor(public cart: CartService) {}
+  constructor(public cart: CartService, private bo: BreakpointObserver) {}
 
   ngOnInit() {
     this.items$ = this.cart.items$;
+    this.bo.observe([Breakpoints.Handset, Breakpoints.TabletPortrait])
+      .subscribe(r => this.isHandset = r.matches);
   }
 
   inc(id: number) {
@@ -39,6 +43,8 @@ export class CartComponent {
   remove(id: number) { this.cart.removeItem(id); }
 
   clear() { this.cart.clear(); }
+ 
+  trackById(index: number, item: CartItem) { return item.id; }
 
   private find(id: number) { return (this.cart as any).itemsSubject.value.find((i: CartItem) => i.id === id) as CartItem | undefined; }
 }

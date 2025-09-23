@@ -12,9 +12,3 @@
 
 [functions]
   node_bundler = "esbuild"
-
-# SPA fallback so client-side routes (e.g. /products/123) serve index.html
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

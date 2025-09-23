@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Observable, combineLatest, map, startWith } from 'rxjs';
@@ -39,6 +39,7 @@ export class ProductListComponent {
 
   showSearch = false;
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('searchArea') searchArea?: ElementRef<HTMLElement>;
 
   filtered$!: Observable<Product[]>;
 
@@ -69,13 +70,24 @@ export class ProductListComponent {
 
   trackById(_i: number, p: Product) { return p.id; }
 
-  toggleSearch() {
-    this.showSearch = !this.showSearch;
-    if (this.showSearch) {
-      setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
-    } else {
-      // Optional: clear search when closing
-      // this.fcSearch.setValue('');
+  openSearch(event: MouseEvent) {
+    event.stopPropagation();
+    this.showSearch = true;
+    setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
+  }
+
+  clearSearch(event: MouseEvent) {
+    event.stopPropagation();
+    this.fcSearch.setValue('');
+    this.searchInput?.nativeElement.focus();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.showSearch) return;
+    const area = this.searchArea?.nativeElement;
+    if (area && !area.contains(event.target as Node)) {
+      this.showSearch = false;
     }
   }
 

@@ -1,7 +1,5 @@
 <div class="wrap">
   <mat-card>
-    <h2>Users (Admins)</h2>
-
     <table mat-table [dataSource]="(users$ | async)!" class="mat-elevation-z1">
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
@@ -38,8 +36,8 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <h3 style="margin-top: 16px;">Add Admin</h3>
-    <form [formGroup]="form" (ngSubmit)="addAdmin()">
+    <h3 style="margin-top: 16px;">Add User</h3>
+    <form [formGroup]="form" (ngSubmit)="addUser()">
       <div class="row">
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
@@ -59,9 +57,16 @@
           <mat-label>Phone</mat-label>
           <input matInput formControlName="phone">
         </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role">
+            <mat-option value="member">Member</mat-option>
+            <mat-option value="admin">Admin</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
       <div style="color:#b00020" *ngIf="error">{{ error }}</div>
-      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Create Admin</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Create User</button>
     </form>
   </mat-card>
 </div>

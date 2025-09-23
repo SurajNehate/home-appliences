@@ -1,12 +1,21 @@
 @use '@angular/material' as mat;
 
-/* Minimal Material 3 theme using Angular Material v19 API */
+/* Material 3 theme using Angular Material v19 API */
+/* Apply purple as primary and amber as secondary (accent) */
 $light-theme: mat.define-theme((
-  color: (theme-type: light),
+  color: (
+    theme-type: light,
+    primary: mat.$purple-palette,
+    secondary: mat.$amber-palette,
+  ),
 ));
 
 $dark-theme: mat.define-theme((
-  color: (theme-type: dark),
+  color: (
+    theme-type: dark,
+    primary: mat.$purple-palette,
+    secondary: mat.$amber-palette,
+  ),
 ));
 
 :root { @include mat.all-component-themes($light-theme); }

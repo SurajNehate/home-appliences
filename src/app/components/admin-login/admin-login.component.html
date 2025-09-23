@@ -1,6 +1,6 @@
 <div class="wrap">
   <mat-card>
-    <h2>Admin Login</h2>
+    <h2>Sign in</h2>
 
     <form [formGroup]="form" (ngSubmit)="login()" class="form">
       <mat-form-field appearance="outline">
@@ -14,8 +14,8 @@
       </mat-form-field>
 
       <div class="actions">
-        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Login</button>
-        <button mat-button type="button" (click)="signupAdmin()">Signup Admin</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Sign in</button>
+        <a mat-button [routerLink]="['/signup']">Don't have an account? Sign up</a>
       </div>
 
       <p class="error" *ngIf="error">{{ error }}</p>

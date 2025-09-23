@@ -6,9 +6,12 @@
   font-weight: 500;
 }
 
+/* Make navigation area use the secondary (amber) container color in the current theme */
 .app-sidenav {
   width: 260px;
   padding: 0.5rem 0.25rem;
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 
 .sidenav-header {
@@ -17,6 +20,13 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   font-weight: 500;
+  background-color: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary);
+}
+
+/* List item hover/active accents using secondary */
+:where(.mat-mdc-nav-list) a.mat-mdc-list-item:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-secondary) 12%, transparent);
 }
 
 .app-content {
@@ -25,4 +35,31 @@
 
 .spacer {
   flex: 1 1 auto;
+}
+
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;   /* nudge slightly above */
+  right: -6px; /* nudge slightly to the right */
+  background: #e53935; /* red */
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 6px;
+  font-size: 0.65rem;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border: 1px solid #b71c1c;
+  pointer-events: none;
+  z-index: 1;
 }

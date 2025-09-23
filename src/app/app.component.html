@@ -5,36 +5,24 @@
                [opened]="!isHandset">
     <div class="sidenav-header">
       <span class="material-symbols-outlined">storefront</span>
-      <span class="brand">Home Decor</span>
+      <span class="brand">havenza</span>
     </div>
     <mat-nav-list>
       <a mat-list-item [routerLink]="['/products']" (click)="closeIfHandset()">
         <span class="material-symbols-outlined">view_list</span>
         <span>Products</span>
       </a>
-      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/products/add']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">add_circle</span>
-        <span>Add Product</span>
-      </a>
       <a mat-list-item [routerLink]="['/cart']" (click)="closeIfHandset()">
         <span class="material-symbols-outlined">shopping_cart</span>
         <span>Cart ({{ cartCount }})</span>
       </a>
-      <a mat-list-item [routerLink]="['/contact-us']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">contact_support</span>
-        <span>Contact</span>
-      </a>
-      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/admin/catalog']" (click)="closeIfHandset()">
+      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/admin']" (click)="closeIfHandset()">
         <span class="material-symbols-outlined">admin_panel_settings</span>
         <span>Admin</span>
       </a>
-      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/admin/orders']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">list_alt</span>
-        <span>Orders</span>
-      </a>
-      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/admin/users']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">group</span>
-        <span>Users</span>
+      <a mat-list-item [routerLink]="['/contact-us']" (click)="closeIfHandset()">
+        <span class="material-symbols-outlined">contact_support</span>
+        <span>Contact</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
@@ -48,17 +36,16 @@
         <span class="material-symbols-outlined">dark_mode</span>
       </button>
       <span class="spacer"></span>
-      <a mat-icon-button [routerLink]="['/cart']" aria-label="Cart">
+      <a mat-icon-button [routerLink]="['/cart']" aria-label="Cart" class="cart-link">
         <span class="material-symbols-outlined">shopping_cart</span>
-        <span style="font-size: 0.8rem; margin-left: 4px;">{{ cartCount }}</span>
+        <span class="cart-badge" aria-label="Cart items">{{ cartCount }}</span>
       </a>
       <ng-container *ngIf="auth.currentUser$ | async as user; else loggedOut">
         <a mat-button [routerLink]="['/profile']">Hi, {{ user.name }}</a>
         <button mat-button (click)="logout()">Logout</button>
       </ng-container>
       <ng-template #loggedOut>
-        <a mat-button [routerLink]="['/admin-login']">Login</a>
-        <a mat-button [routerLink]="['/signup']">Sign up</a>
+        <a mat-button [routerLink]="['/admin-login']">Sign in</a>
       </ng-template>
     </mat-toolbar>
 

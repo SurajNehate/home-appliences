@@ -13,6 +13,7 @@ import { SignupComponent } from './components/signup/signup.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { adminGuard } from './guards/admin.guard';
 import { cartNotEmptyGuard } from './guards/cart-not-empty.guard';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
@@ -26,7 +27,15 @@ export const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'admin-login', component: AdminLoginComponent },
-  { path: 'admin/catalog', component: AdminCatalogComponent, canActivate: [adminGuard] },
-  { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [adminGuard] },
-  { path: 'admin/users', component: AdminUsersComponent, canActivate: [adminGuard] },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [adminGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'products' },
+      { path: 'products', component: AdminCatalogComponent },
+      { path: 'orders', component: AdminOrdersComponent },
+      { path: 'users', component: AdminUsersComponent },
+    ]
+  },
 ];

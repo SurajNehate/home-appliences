@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Order #{{ data.order?.id }} details</h2>
+<div mat-dialog-content>
+  <table class="items">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let it of data.order?.items">
+        <td>
+          <img [src]="it.image_url || 'https://picsum.photos/seed/' + (it.product_id || it.id) + '/60/60'"
+               [alt]="it.name" width="60" height="60" />
+        </td>
+        <td>{{ it.name }}</td>
+        <td>₹ {{ it.price | number:'1.0-2' }}</td>
+        <td>{{ it.qty }}</td>
+        <td>₹ {{ (it.price * it.qty) | number:'1.0-2' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="order-total">Order Total: <strong>₹ {{ total | number:'1.0-2' }}</strong></div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</div>

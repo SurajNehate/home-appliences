@@ -1,13 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-root',
@@ -27,9 +28,16 @@ import { CartService } from './services/cart.service';
 })
 export class AppComponent {
   private readonly document = inject(DOCUMENT);
-  dark = false;
+  private readonly bo = inject(BreakpointObserver);
+  @ViewChild('sidenav') sidenav?: MatSidenav;
 
-  constructor(public auth: AuthService, public cart: CartService) {}
+  dark = false;
+  isHandset = false;
+
+  constructor(public auth: AuthService, public cart: CartService) {
+    // Update handset flag on breakpoint changes
+    this.bo.observe([Breakpoints.Handset]).subscribe(r => this.isHandset = r.matches);
+  }
 
   toggleTheme(): void {
     this.dark = !this.dark;
@@ -48,5 +56,11 @@ export class AppComponent {
   logout() { this.auth.logout(); }
   get cartCount(): number {
     try { return (this.cart as any).itemsSubject.value.reduce((s: number, i: any) => s + (Number(i.qty)||0), 0); } catch { return 0; }
+  }
+
+  closeIfHandset() {
+    if (this.isHandset) {
+      this.sidenav?.close();
+    }
   }
 }

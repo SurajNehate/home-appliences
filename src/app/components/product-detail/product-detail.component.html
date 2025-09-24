@@ -1,39 +1,165 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb-nav py-md" aria-label="Breadcrumb">
+  <div class="container">
+    <a [routerLink]="['/']" class="breadcrumb-link transition-colors hover:opacity-80" 
+       aria-label="Back to Products">
+      <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+      <span class="breadcrumb-text">Back to Products</span>
+    </a>
+  </div>
+</nav>
+
 <ng-container *ngIf="current as p">
-  <mat-card class="detail">
-    <div class="viewer">
-      <div class="thumbs" *ngIf="images.length > 1">
-        <img *ngFor="let url of images; let i = index; trackBy: trackByUrl"
-             [src]="url"
-             [alt]="p.name"
-             [class.selected]="i === selectedIndex"
-             (click)="selectImage(i)" />
-      </div>
-      <div class="main">
-        <img [src]="images[selectedIndex]" [alt]="p.name" (click)="openLightbox()">
+  <main class="product-detail-main" role="main">
+    <div class="container">
+      <div class="product-detail-grid">
+        <!-- Image Gallery Section -->
+        <section class="image-gallery" aria-label="Product Images">
+          <div class="gallery-container">
+            <!-- Thumbnail Navigation -->
+            <div class="thumbnails-wrapper" *ngIf="images.length > 1" role="tablist" aria-label="Product image gallery">
+              <button *ngFor="let url of images; let i = index; trackBy: trackByUrl"
+                      type="button"
+                      role="tab"
+                      class="thumbnail transition-all hover:scale-105 focus:ring"
+                      [class.thumbnail--active]="i === selectedIndex"
+                      [attr.aria-selected]="i === selectedIndex"
+                      [attr.aria-label]="'View image ' + (i + 1) + ' of ' + images.length"
+                      (click)="selectImage(i)"
+                      (keydown.enter)="selectImage(i)"
+                      (keydown.space)="selectImage(i); $event.preventDefault()">
+                <img [src]="url" [alt]="p.name + ' - Image ' + (i + 1)" class="thumbnail-image" loading="lazy" />
+              </button>
+            </div>
+            
+            <!-- Main Image Display -->
+            <div class="main-image-container" role="tabpanel" [attr.aria-label]="'Image ' + (selectedIndex + 1) + ' of ' + images.length">
+              <button type="button" 
+                      class="main-image-button transition-transform hover:scale-105 focus:ring"
+                      (click)="openLightbox()"
+                      [attr.aria-label]="'Open ' + p.name + ' in full screen'">
+                <img [src]="images[selectedIndex]" 
+                     [alt]="p.name" 
+                     class="main-image"
+                     loading="eager" />
+                <div class="zoom-overlay" aria-hidden="true">
+                  <span class="material-symbols-outlined">zoom_in</span>
+                  <span class="zoom-text">Click to zoom</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Product Information Section -->
+        <section class="product-info" aria-label="Product Information">
+          <div class="product-info-content">
+            <!-- Category Badge -->
+            <div class="category-badge" *ngIf="p.category">
+              {{ p.category }}
+            </div>
+            
+            <!-- Product Title -->
+            <h1 class="product-title">{{ p.name }}</h1>
+            
+            <!-- Product Price -->
+            <div class="price-section">
+              <span class="price" [attr.aria-label]="'Price: ' + (p.price | currency:'INR':'symbol':'1.2-2')">₹{{ p.price | number:'1.2-2' }}</span>
+            </div>
+            
+            <!-- Product Description -->
+            <div class="description-section" *ngIf="p.description">
+              <p class="product-description">{{ p.description }}</p>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="details-section">
+              <h3 class="details-title">Product Details</h3>
+              <dl class="details-list">
+                <div class="detail-item">
+                  <dt class="detail-label">Category:</dt>
+                  <dd class="detail-value">{{ p.category || 'General' }}</dd>
+                </div>
+                <div class="detail-item">
+                  <dt class="detail-label">Status:</dt>
+                  <dd class="detail-value">
+                    <span class="status-badge status-badge--active">active</span>
+                  </dd>
+                </div>
+                <div class="detail-item">
+                  <dt class="detail-label">Added:</dt>
+                  <dd class="detail-value">{{ '15/1/2024' }}</dd>
+                </div>
+              </dl>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button type="button" 
+                      mat-flat-button 
+                      class="add-to-cart-btn transition-all hover:shadow-lg focus:ring"
+                      (click)="add(p)"
+                      [attr.aria-label]="'Add ' + p.name + ' to cart'">
+                <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span>
+                <span>Add to Cart</span>
+              </button>
+              
+              <button type="button" 
+                      mat-icon-button 
+                      class="wishlist-btn transition-all hover:scale-105 focus:ring"
+                      (click)="toggleWishlist(p)"
+                      [attr.aria-label]="'Add ' + p.name + ' to wishlist'">
+                <span class="material-symbols-outlined" aria-hidden="true">favorite_border</span>
+              </button>
+            </div>
+            
+            <!-- View Cart Link -->
+            <div class="view-cart-section">
+              <a [routerLink]="['/cart']" 
+                 class="view-cart-link transition-colors hover:opacity-80"
+                 aria-label="View shopping cart">
+                View Cart
+              </a>
+            </div>
+            
+            <!-- Why Choose This Product -->
+            <div class="features-section">
+              <h3 class="features-title">Why Choose This Product</h3>
+              <ul class="features-list" role="list">
+                <li class="feature-item" role="listitem">
+                  <span class="feature-bullet" aria-hidden="true"></span>
+                  <span>High-quality materials and construction</span>
+                </li>
+                <li class="feature-item" role="listitem">
+                  <span class="feature-bullet" aria-hidden="true"></span>
+                  <span>Modern design that complements any space</span>
+                </li>
+                <li class="feature-item" role="listitem">
+                  <span class="feature-bullet" aria-hidden="true"></span>
+                  <span>Easy to maintain and clean</span>
+                </li>
+                <li class="feature-item" role="listitem">
+                  <span class="feature-bullet" aria-hidden="true"></span>
+                  <span>30-day return policy</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
-
-    <mat-card-header>
-      <mat-card-title>{{ p.name }}</mat-card-title>
-      <mat-card-subtitle>{{ p.category }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p>{{ p.description }}</p>
-      <p class="price">₹ {{ p.price | number:'1.0-2' }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-flat-button color="primary" (click)="add(p)">
-        <span class="material-symbols-outlined">add_shopping_cart</span>&nbsp;Add to cart
-      </button>
-      <a mat-stroked-button [routerLink]="['/products']">
-        <span class="material-symbols-outlined">arrow_back</span>&nbsp;Back
-      </a>
-    </mat-card-actions>
-  </mat-card>
+  </main>
 </ng-container>
 
 <!-- Lightbox for full-screen image with pinch-zoom and pan -->
-<div class="lightbox" *ngIf="lightboxOpen" (click)="closeLightbox()">
+<div class="lightbox" 
+     *ngIf="lightboxOpen" 
+     role="dialog"
+     aria-modal="true"
+     [attr.aria-label]="'Full screen view of ' + (current?.name || 'product image')"
+     (click)="closeLightbox()"
+     (keydown)="onLightboxKeydown($event)"
+     tabindex="-1">
   <div #inner class="lightbox-inner"
        (click)="$event.stopPropagation()"
        (wheel)="onWheel($event)"
@@ -44,13 +170,44 @@
        (pointerleave)="onPointerUp($event)"
        [style.cursor]="isPanning ? 'grabbing' : (scale > 1 ? 'grab' : 'zoom-in')">
     <img #imgEl [src]="images[selectedIndex]"
-         [alt]="current?.name"
+         [alt]="current?.name + ' - Image ' + (selectedIndex + 1) + ' of ' + images.length"
          [style.transform]="transform"
          [style.transition]="isPanning || isPinching ? 'none' : 'transform 120ms ease'"
          (load)="onImageLoad()"
          draggable="false" />
   </div>
-  <button class="close" (click)="closeLightbox()" aria-label="Close">
+  
+  <!-- Navigation arrows for multiple images -->
+  <button *ngIf="images.length > 1 && selectedIndex > 0"
+          type="button"
+          class="lightbox-nav lightbox-nav--prev"
+          (click)="selectImage(selectedIndex - 1)"
+          aria-label="Previous image">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+  
+  <button *ngIf="images.length > 1 && selectedIndex < images.length - 1"
+          type="button"
+          class="lightbox-nav lightbox-nav--next"
+          (click)="selectImage(selectedIndex + 1)"
+          aria-label="Next image">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+  
+  <!-- Close button -->
+  <button type="button" 
+          class="close" 
+          (click)="closeLightbox()" 
+          aria-label="Close full screen view">
     <span class="material-symbols-outlined">close</span>
   </button>
+  
+  <!-- Image counter -->
+  <div *ngIf="images.length > 1" 
+       class="lightbox-counter"
+       role="status"
+       aria-live="polite"
+       [attr.aria-label]="'Image ' + (selectedIndex + 1) + ' of ' + images.length">
+    {{ selectedIndex + 1 }} / {{ images.length }}
+  </div>
 </div>

@@ -6,22 +6,28 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name" required>
+        <mat-error *ngIf="form.get('name')?.hasError('required') && form.get('name')?.touched">Name is required</mat-error>
+        <mat-error *ngIf="form.get('name')?.hasError('minlength') && form.get('name')?.touched">Name is too short</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" required>
+        <mat-error *ngIf="form.get('email')?.hasError('required') && form.get('email')?.touched">Email is required</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email') && form.get('email')?.touched">Enter a valid email</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Password</mat-label>
         <input matInput type="password" formControlName="password" required>
+        <mat-error *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched">Password is required</mat-error>
+        <mat-error *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched">Minimum 6 characters</mat-error>
       </mat-form-field>
 
-      <div style="color: #b00020" *ngIf="error">{{ error }}</div>
+<div class="text-error" *ngIf="error">{{ error }}</div>
 
       <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Create account</button>
-      <a mat-button [routerLink]="['/admin-login']">Have an account? Login</a>
+      <a mat-button [routerLink]="['/login']">Have an account? Login</a>
     </form>
   </mat-card>
 </div>

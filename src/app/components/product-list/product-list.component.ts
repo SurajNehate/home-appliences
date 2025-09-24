@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
@@ -26,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
+    MatProgressBarModule,
   ],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
@@ -37,9 +39,7 @@ export class ProductListComponent {
   fcCategory = new FormControl<string>('all', { nonNullable: true });
   fcSearch = new FormControl<string>('', { nonNullable: true });
 
-  showSearch = false;
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
-  @ViewChild('searchArea') searchArea?: ElementRef<HTMLElement>;
 
   filtered$!: Observable<Product[]>;
 
@@ -70,25 +70,10 @@ export class ProductListComponent {
 
   trackById(_i: number, p: Product) { return p.id; }
 
-  openSearch(event: MouseEvent) {
-    event.stopPropagation();
-    this.showSearch = true;
-    setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
-  }
-
   clearSearch(event: MouseEvent) {
     event.stopPropagation();
     this.fcSearch.setValue('');
     this.searchInput?.nativeElement.focus();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.showSearch) return;
-    const area = this.searchArea?.nativeElement;
-    if (area && !area.contains(event.target as Node)) {
-      this.showSearch = false;
-    }
   }
 
   add(p: Product) {
@@ -97,5 +82,10 @@ export class ProductListComponent {
 
   goTo(p: Product) {
     this.router.navigate(['/products', p.id]);
+  }
+
+  editProduct(p: Product, event: MouseEvent) {
+    event.stopPropagation();
+    this.router.navigate(['/products/edit', p.id]);
   }
 }

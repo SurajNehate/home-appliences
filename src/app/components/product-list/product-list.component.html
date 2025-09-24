@@ -1,49 +1,63 @@
-<div class="filters" *ngIf="categories$ | async as categories">
-  <mat-form-field class="category dense" appearance="outline">
-    <mat-label>Category</mat-label>
-    <mat-select [formControl]="fcCategory">
-      <mat-option value="all">All</mat-option>
-      <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-<div class="filters-right mat-elevation-z2" #searchArea>
-    <button *ngIf="!showSearch" mat-icon-button class="search-toggle" (click)="openSearch($event)" aria-label="Toggle search">
-      <span class="material-symbols-outlined">search</span>
-    </button>
-
-    <div class="search-wrap" [class.open]="showSearch">
-      <mat-form-field class="search dense mat-elevation-z1" appearance="outline">
-        <mat-label>Search</mat-label>
-        <input #searchInput matInput placeholder="Search products" [formControl]="fcSearch" (click)="$event.stopPropagation()"/>
-        <button mat-icon-button matSuffix class="clear-btn" *ngIf="fcSearch.value" (click)="clearSearch($event)" aria-label="Clear search">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </mat-form-field>
+<section class="section-lg container">
+  <div class="home-header">
+    <div>
+      <h1 class="h1">Havenza Collection</h1>
+      <p class="h2">Discover our curated selection of modern home decor items to transform your living space.</p>
     </div>
   </div>
-</div>
+</section>
 
-<div class="grid" *ngIf="filtered$ | async as products">
-  <mat-card class="card" *ngFor="let p of products; trackBy: trackById" (click)="goTo(p)">
-    <img mat-card-image [src]="p.imageUrl || 'https://picsum.photos/seed/' + p.id + '/600/400'" [alt]="p.name">
-    <mat-card-header>
-      <mat-card-title>{{ p.name }}</mat-card-title>
-      <mat-card-subtitle>{{ p.category }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p class="price">₹ {{ p.price | number:'1.0-2' }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-flat-button color="primary" (click)="add(p); $event.stopPropagation()">
-        <span class="material-symbols-outlined">add_shopping_cart</span>&nbsp;Add
+<section class="section container" *ngIf="categories$ | async as categories">
+  <div class="controls rounded shadow-sm">
+    <mat-form-field class="search" appearance="outline">
+      <span matPrefix class="material-symbols-outlined">search</span>
+      <input #searchInput matInput placeholder="Search products..." [formControl]="fcSearch" />
+      <button mat-icon-button matSuffix class="clear-btn" *ngIf="fcSearch.value" (click)="clearSearch($event)" aria-label="Clear search">
+        <span class="material-symbols-outlined">close</span>
       </button>
-      <a *ngIf="auth.isAdmin()" mat-stroked-button color="accent" [routerLink]="['/products/edit', p.id]" (click)="$event.stopPropagation()">
-        <span class="material-symbols-outlined">edit</span>&nbsp;Edit
-      </a>
-    </mat-card-actions>
-  </mat-card>
-</div>
+    </mat-form-field>
+
+    <mat-form-field class="category dense" appearance="outline">
+      <mat-select [formControl]="fcCategory" placeholder="Category">
+        <mat-option value="all">All</mat-option>
+        <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="grid" role="list" *ngIf="filtered$ | async as products">
+    <mat-card class="card transition-base" role="listitem" *ngFor="let p of products; trackBy: trackById" (click)="goTo(p)" tabindex="0" (keydown.enter)="goTo(p)">
+      <div class="media">
+        <img mat-card-image [src]="p.imageUrl || 'https://picsum.photos/seed/' + p.id + '/600/400'" [alt]="p.name" loading="lazy" />
+        <span class="badge" *ngIf="p.category">{{ p.category }}</span>
+      </div>
+      <mat-card-header>
+        <mat-card-title>{{ p.name }}</mat-card-title>
+        <mat-card-subtitle class="text-muted">{{ p.category }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="price">₹ {{ p.price | number:'1.0-2' }}</p>
+      </mat-card-content>
+      <mat-card-actions class="card-actions">
+        <button mat-flat-button class="add-to-cart-btn" (click)="add(p); $event.stopPropagation()" [attr.aria-label]="'Add ' + p.name + ' to cart'">
+          <span class="material-symbols-outlined">shopping_cart</span>
+          Add to Cart
+        </button>
+        <button *ngIf="auth.isAdmin()" mat-icon-button class="edit-btn" (click)="editProduct(p, $event)" [attr.aria-label]="'Edit ' + p.name">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>
+
+<ng-template #loadingTpl>
+  <div class="container section">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</ng-template>
 
 <div class="actions" *ngIf="auth.isAdmin()">
   <a mat-fab color="accent" [routerLink]="['/products/add']" aria-label="Add product">

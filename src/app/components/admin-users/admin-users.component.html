@@ -65,7 +65,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div style="color:#b00020" *ngIf="error">{{ error }}</div>
+<div class="text-error" *ngIf="error">{{ error }}</div>
       <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Create User</button>
     </form>
   </mat-card>

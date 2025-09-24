@@ -31,8 +31,19 @@ export class AdminLoginComponent {
     const { email, password } = this.form.value as any;
     this.error = '';
     this.auth.login(email, password).subscribe({
-      next: () => this.router.navigate(['/admin']),
-      error: (e) => this.error = e?.error?.error || 'LOGIN_FAILED'
+      next: (response) => {
+        // Redirect based on user role (case-insensitive, safe)
+        const role = (response?.user?.role || '').toLowerCase();
+        if (role === 'admin') {
+          this.router.navigate(['/admin'], { replaceUrl: true });
+        } else {
+          // Regular members go to home page
+          this.router.navigate(['/'], { replaceUrl: true });
+        }
+      },
+      error: (e) => {
+        this.error = e?.error?.error || 'LOGIN_FAILED';
+      }
     });
   }
 }

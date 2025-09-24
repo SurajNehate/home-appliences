@@ -1,14 +1,13 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-root',
@@ -17,28 +16,21 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     CommonModule,
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     MatToolbarModule,
-    MatSidenavModule,
     MatListModule,
     MatIconModule,
     MatButtonModule,
+    MatMenuModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   private readonly document = inject(DOCUMENT);
-  private readonly bo = inject(BreakpointObserver);
-  @ViewChild('sidenav') sidenav?: MatSidenav;
-
   dark = false;
-  isHandset = false;
 
-  constructor(public auth: AuthService, public cart: CartService) {
-    // Treat small tablets like phones for the sidenav: collapse on Handset and TabletPortrait
-    this.bo.observe([Breakpoints.Handset, Breakpoints.TabletPortrait])
-      .subscribe(r => this.isHandset = r.matches);
-  }
+  constructor(public auth: AuthService, public cart: CartService) {}
 
   toggleTheme(): void {
     this.dark = !this.dark;
@@ -59,9 +51,4 @@ export class AppComponent {
     try { return (this.cart as any).itemsSubject.value.reduce((s: number, i: any) => s + (Number(i.qty)||0), 0); } catch { return 0; }
   }
 
-  closeIfHandset() {
-    if (this.isHandset) {
-      this.sidenav?.close();
-    }
-  }
 }

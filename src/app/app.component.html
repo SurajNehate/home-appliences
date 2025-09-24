@@ -1,56 +1,82 @@
-<mat-sidenav-container class="app-shell">
-  <mat-sidenav #sidenav
-               class="app-sidenav"
-               [mode]="isHandset ? 'over' : 'side'"
-               [opened]="!isHandset">
-    <div class="sidenav-header">
-      <span class="material-symbols-outlined">storefront</span>
-      <span class="brand">havenza</span>
+<mat-toolbar color="primary" class="app-toolbar" role="navigation" aria-label="Primary">
+  <!-- Left: Brand only -->
+  <a class="brand-row" [routerLink]="['/']" aria-label="Havenza home">
+    <span class="material-symbols-outlined brand-icon">storefront</span>
+    <span class="brand">Havenza</span>
+  </a>
+
+  <!-- Center: Main Navigation -->
+  <div class="nav-center">
+    <a mat-button [routerLink]="['/']" routerLinkActive="active" #homeRla="routerLinkActive" [attr.aria-current]="homeRla.isActive ? 'page' : null">Home</a>
+    <a mat-button [routerLink]="['/cart']" routerLinkActive="active" #cartRla="routerLinkActive" [attr.aria-current]="cartRla.isActive ? 'page' : null">Cart ({{ cartCount }})</a>
+    <a mat-button [routerLink]="['/contact-us']" routerLinkActive="active" #contactRla="routerLinkActive" [attr.aria-current]="contactRla.isActive ? 'page' : null">Contact</a>
+
+    <!-- Admin actions (admins only) -->
+    <ng-container *ngIf="isAdmin()">
+      <a mat-button [routerLink]="['/admin/products']" routerLinkActive="active">Catalog</a>
+      <a mat-button [routerLink]="['/admin/orders']" routerLinkActive="active">Orders</a>
+      <a mat-button [routerLink]="['/admin/users']" routerLinkActive="active">Users</a>
+    </ng-container>
+  </div>
+
+  <!-- Right: Theme toggle, mobile menu and auth -->
+  <div class="nav-right">
+    <!-- Mobile hamburger menu (shown only on small screens via CSS) -->
+    <button class="mobile-menu-btn" mat-icon-button [matMenuTriggerFor]="mainMenu" aria-label="Open menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+
+    <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+      <span class="material-symbols-outlined">dark_mode</span>
+    </button>
+
+    <!-- Profile / auth actions -->
+    <ng-container *ngIf="auth.currentUser$ | async as user; else loggedOut">
+      <a mat-icon-button [routerLink]="['/profile']" [attr.aria-label]="'Profile: ' + user.name">
+        <span class="material-symbols-outlined">person</span>
+      </a>
+      <button mat-icon-button (click)="logout()" aria-label="Logout">
+        <span class="material-symbols-outlined">logout</span>
+      </button>
+    </ng-container>
+    <ng-template #loggedOut>
+      <a mat-icon-button [routerLink]="['/login']" aria-label="Sign in">
+        <span class="material-symbols-outlined">login</span>
+      </a>
+    </ng-template>
+  </div>
+  <!-- Mobile menu content -->
+  <mat-menu #mainMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/']">Home</button>
+    <button mat-menu-item [routerLink]="['/cart']">Cart ({{ cartCount }})</button>
+    <button mat-menu-item [routerLink]="['/contact-us']">Contact</button>
+    <ng-container *ngIf="isAdmin()">
+      <button mat-menu-item [routerLink]="['/admin/products']">Catalog</button>
+      <button mat-menu-item [routerLink]="['/admin/orders']">Orders</button>
+      <button mat-menu-item [routerLink]="['/admin/users']">Users</button>
+    </ng-container>
+  </mat-menu>
+</mat-toolbar>
+
+<main class="app-content" id="main" role="main">
+  <router-outlet />
+</main>
+
+<footer class="app-footer" role="contentinfo">
+  <div class="footer-content">
+    <div class="footer-left">
+      <p class="footer-text">© 2024 Havenza. All rights reserved.</p>
     </div>
-    <mat-nav-list>
-      <a mat-list-item [routerLink]="['/products']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">view_list</span>
-        <span>Products</span>
+    <div class="footer-right">
+      <a href="https://linkedin.com" class="footer-link transition-colors hover:opacity-80" aria-label="LinkedIn" target="_blank" rel="noopener">
+        LinkedIn
       </a>
-      <a mat-list-item [routerLink]="['/cart']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <span>Cart ({{ cartCount }})</span>
+      <a href="https://whatsapp.com" class="footer-link transition-colors hover:opacity-80" aria-label="WhatsApp" target="_blank" rel="noopener">
+        WhatsApp
       </a>
-      <a mat-list-item *ngIf="isAdmin()" [routerLink]="['/admin']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">admin_panel_settings</span>
-        <span>Admin</span>
+      <a href="mailto:contact@havenza.com" class="footer-link transition-colors hover:opacity-80" aria-label="Email">
+        Email
       </a>
-      <a mat-list-item [routerLink]="['/contact-us']" (click)="closeIfHandset()">
-        <span class="material-symbols-outlined">contact_support</span>
-        <span>Contact</span>
-      </a>
-    </mat-nav-list>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <mat-toolbar color="primary" class="app-toolbar">
-      <button mat-icon-button *ngIf="isHandset" (click)="sidenav.toggle()" aria-label="Open menu">
-        <span class="material-symbols-outlined">menu</span>
-      </button>
-      <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
-        <span class="material-symbols-outlined">dark_mode</span>
-      </button>
-      <span class="spacer"></span>
-      <a mat-icon-button [routerLink]="['/cart']" aria-label="Cart" class="cart-link">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <span class="cart-badge" aria-label="Cart items">{{ cartCount }}</span>
-      </a>
-      <ng-container *ngIf="auth.currentUser$ | async as user; else loggedOut">
-        <a mat-button [routerLink]="['/profile']">Hi, {{ user.name }}</a>
-        <button mat-button (click)="logout()">Logout</button>
-      </ng-container>
-      <ng-template #loggedOut>
-        <a mat-button [routerLink]="['/admin-login']">Sign in</a>
-      </ng-template>
-    </mat-toolbar>
-
-    <main class="app-content">
-      <router-outlet />
-    </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+    </div>
+  </div>
+</footer>

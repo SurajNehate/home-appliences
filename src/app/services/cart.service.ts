@@ -7,6 +7,7 @@ export interface CartItem {
   name: string;
   price: number;
   imageUrl?: string;
+  category?: string;
   qty: number;
 }
 
@@ -37,7 +38,7 @@ export class CartService {
     if (found) {
       found.qty += qty;
     } else if (p.id) {
-      items.push({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl, qty });
+      items.push({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl, category: p.category, qty });
     }
     this.write(items);
   }

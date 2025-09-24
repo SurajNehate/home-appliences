@@ -1,30 +1,73 @@
-.app-shell {
-  height: 100vh;
-}
-
 .app-toolbar .title {
   font-weight: 500;
 }
 
-.app-sidenav {
-  width: 260px;
-  padding: 0.5rem 0.25rem;
-}
+/* Top-level content fills window width */
+.app-content { padding: 1rem; }
 
-.sidenav-header {
+/* Toolbar layout: brand left, nav center, actions right */
+.app-toolbar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
-}
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
 
-.app-content {
-  padding: 1rem;
-}
+  /* Hide mobile menu button on desktop by default */
+  .mobile-menu-btn { display: none; }
 
-.spacer {
-  flex: 1 1 auto;
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+
+    .brand-icon {
+      font-size: 28px;
+      color: #9c27b0; /* Purple 500 */
+    }
+
+    .brand {
+      color: #ffca28; /* Amber 400 */
+    }
+  }
+
+  .nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    a.mat-button {
+      margin: 0 4px;
+    }
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+
+    .mat-mdc-icon-button,
+    a.mat-mdc-icon-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .material-symbols-outlined {
+        font-size: 20px;
+      }
+    }
+  }
 }
 
 .cart-link {
@@ -37,11 +80,17 @@
 }
 
 .cart-badge {
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
   position: absolute;
   top: -4px;   /* nudge slightly above */
   right: -6px; /* nudge slightly to the right */
-  background: #e53935; /* red */
-  color: #fff;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
   border-radius: 999px;
   padding: 0 6px;
   font-size: 0.65rem;
@@ -49,7 +98,85 @@
   height: 16px;
   line-height: 16px;
   text-align: center;
-  border: 1px solid #b71c1c;
+  border: 1px solid rgba(0,0,0,0.25);
   pointer-events: none;
   z-index: 1;
+}
+.theme-dark .cart-badge {
+  /* subtle border for dark mode */
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* Footer Styles */
+.app-footer {
+  margin-top: auto;
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  padding: var(--space-xl) 0;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-text {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.footer-right {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.footer-link {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+
+  &:hover {
+    color: var(--foreground);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: var(--space-lg);
+    text-align: center;
+  }
+
+  .footer-right {
+    gap: var(--space-lg);
+  }
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .app-toolbar {
+    .nav-center {
+      position: static;
+      transform: none;
+      display: none; /* Hidden on mobile; use hamburger menu instead */
+    }
+
+    .mobile-menu-btn {
+      display: inline-flex;
+    }
+
+    .brand-row {
+      font-size: 1.1rem;
+
+      .brand-icon {
+        font-size: 24px;
+      }
+    }
+  }
 }

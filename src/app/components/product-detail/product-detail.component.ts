@@ -179,4 +179,23 @@ export class ProductDetailComponent {
   add(p: Product) {
     this.cart.addItem(p, 1);
   }
+
+  toggleWishlist(p: Product) {
+    // Placeholder for wishlist functionality
+    console.log('Toggle wishlist for:', p.name);
+    // TODO: Implement wishlist service
+  }
+
+  // Keyboard navigation for lightbox
+  onLightboxKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.closeLightbox();
+    } else if (event.key === 'ArrowLeft' && this.images.length > 1) {
+      const newIndex = this.selectedIndex === 0 ? this.images.length - 1 : this.selectedIndex - 1;
+      this.selectImage(newIndex);
+    } else if (event.key === 'ArrowRight' && this.images.length > 1) {
+      const newIndex = this.selectedIndex === this.images.length - 1 ? 0 : this.selectedIndex + 1;
+      this.selectImage(newIndex);
+    }
+  }
 }

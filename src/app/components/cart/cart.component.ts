@@ -46,5 +46,17 @@ export class CartComponent {
  
   trackById(index: number, item: CartItem) { return item.id; }
 
+  updateQuantity(id: number, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newQty = parseInt(target.value, 10);
+    if (newQty && newQty > 0 && newQty <= 99) {
+      this.cart.updateQty(id, newQty);
+    }
+  }
+
+  getTotalItems(items: CartItem[]): number {
+    return items.reduce((total, item) => total + item.qty, 0);
+  }
+
   private find(id: number) { return (this.cart as any).itemsSubject.value.find((i: CartItem) => i.id === id) as CartItem | undefined; }
 }

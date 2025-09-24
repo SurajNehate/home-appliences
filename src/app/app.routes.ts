@@ -16,17 +16,22 @@ import { cartNotEmptyGuard } from './guards/cart-not-empty.guard';
 import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/products', pathMatch: 'full' },
-  { path: 'products', component: ProductListComponent },
+  // Home shows the products list
+  { path: '', component: ProductListComponent, pathMatch: 'full' },
+  // Keep legacy /products path working by redirecting to home
+  { path: 'products', redirectTo: '', pathMatch: 'full' },
+
   { path: 'products/add', component: ProductFormComponent },
   { path: 'products/edit/:id', component: ProductFormComponent },
   { path: 'products/:id', component: ProductDetailComponent },
+
   { path: 'cart', component: CartComponent },
   { path: 'checkout-guest', component: CheckoutGuestComponent, canActivate: [cartNotEmptyGuard] },
   { path: 'contact-us', component: ContactUsComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'admin-login', component: AdminLoginComponent },
+  { path: 'login', component: AdminLoginComponent },
+  { path: 'admin-login', component: AdminLoginComponent }, // Keep for backward compatibility
   {
     path: 'admin',
     component: AdminComponent,
@@ -38,4 +43,7 @@ export const routes: Routes = [
       { path: 'users', component: AdminUsersComponent },
     ]
   },
+
+  // Fallback: any unknown route goes to home (helps with Netlify refresh)
+  { path: '**', redirectTo: '' },
 ];

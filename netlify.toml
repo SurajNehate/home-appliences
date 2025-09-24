@@ -9,6 +9,15 @@
   command = "npm start"
   port = 8888         # Netlify Dev proxy server
   targetPort = 4200   # Angular dev server used by `npm start`
+  framework = "#static"
+  publish = "dist/home-decor-v19/browser"
 
 [functions]
   node_bundler = "esbuild"
+
+# SPA fallback: serve index.html for all non-file routes
+# This is a 200 rewrite (no URL change), safe for Angular routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

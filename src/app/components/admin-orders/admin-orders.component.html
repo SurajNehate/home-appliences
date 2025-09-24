@@ -1,42 +1,190 @@
-<div class="wrap">
-  <mat-card>
-    <table mat-table [dataSource]="(orders$ | async) || []" class="mat-elevation-z1">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let o"> {{ o.id }} </td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let o"> {{ o.name }} </td>
-      </ng-container>
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef> Email </th>
-        <td mat-cell *matCellDef="let o"> {{ o.email }} </td>
-      </ng-container>
-      <ng-container matColumnDef="contact">
-        <th mat-header-cell *matHeaderCellDef> Contact </th>
-        <td mat-cell *matCellDef="let o">
-          <div>{{ o.phone }}</div>
-          <div>{{ o.address }}</div>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="total">
-        <th mat-header-cell *matHeaderCellDef> Total </th>
-        <td mat-cell *matCellDef="let o"> ₹ {{ o.total | number:'1.0-2' }} </td>
-      </ng-container>
-      <ng-container matColumnDef="created_at">
-        <th mat-header-cell *matHeaderCellDef> Created </th>
-        <td mat-cell *matCellDef="let o"> {{ o.created_at | date:'short' }} </td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let o">
-          <button mat-button (click)="view(o)"><span class="material-symbols-outlined">visibility</span>&nbsp;View details</button>
-        </td>
-      </ng-container>
+<main class="admin-container" role="main">
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-title-section">
+        <div class="header-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+        <div>
+          <h1 class="page-title">Order Management</h1>
+          <p class="page-subtitle">Track and manage customer orders</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Add any header actions here -->
+      </div>
+    </div>
+  </header>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  </mat-card>
-</div>
+  <!-- Orders Section -->
+  <section class="content-section" aria-label="Orders list">
+    <div class="section-header">
+      <div class="section-title-area">
+        <h2 class="section-title">Orders</h2>
+        <p class="section-subtitle">View and manage all customer orders</p>
+      </div>
+      <div class="section-controls">
+        <div class="search-container">
+          <mat-form-field class="search-field" appearance="outline">
+            <span matPrefix class="material-symbols-outlined search-icon">search</span>
+            <input matInput placeholder="Search orders by ID, name, or email..." 
+                   [formControl]="searchControl"
+                   #searchInput
+                   aria-label="Search orders" />
+            <button mat-icon-button matSuffix class="clear-btn" 
+                    *ngIf="searchControl.value" 
+                    (click)="clearSearch()"
+                    aria-label="Clear search">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </mat-form-field>
+        </div>
+        <mat-form-field class="status-filter" appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select [formControl]="statusControl" aria-label="Filter by status">
+            <mat-option value="all">All Statuses</mat-option>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="processing">Processing</mat-option>
+            <mat-option value="shipped">Shipped</mat-option>
+            <mat-option value="delivered">Delivered</mat-option>
+            <mat-option value="cancelled">Cancelled</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Orders Table/List -->
+    <div class="table-container">
+      <div class="table-wrapper">
+        <!-- Desktop Table -->
+        <div class="desktop-table" *ngIf="!isHandset">
+          <div class="table-header" role="row">
+            <div class="header-cell header-order-id" role="columnheader">Order ID</div>
+            <div class="header-cell header-customer" role="columnheader">Customer</div>
+            <div class="header-cell header-items" role="columnheader">Items</div>
+            <div class="header-cell header-total" role="columnheader">Total</div>
+            <div class="header-cell header-status" role="columnheader">Status</div>
+            <div class="header-cell header-date" role="columnheader">Date</div>
+            <div class="header-cell header-actions" role="columnheader">Actions</div>
+          </div>
+
+          <div class="table-body" role="list" [attr.aria-label]="'Orders list with ' + (filteredOrders$ | async)?.length + ' orders'">
+            <div *ngFor="let order of filteredOrders$ | async; trackBy: trackByOrderId; let i = index" 
+                 class="table-row transition-all hover:shadow-md"
+                 role="listitem"
+                 [attr.aria-label]="'Order ' + order.id + ' for ' + order.name + ', total ' + (order.total | currency:'INR':'symbol':'1.2-2')">
+              
+              <!-- Order ID -->
+              <div class="table-cell cell-order-id">
+                <span class="order-id-badge">ORD-{{ order.id.toString().padStart(3, '0') }}</span>
+              </div>
+
+              <!-- Customer -->
+              <div class="table-cell cell-customer">
+                <div class="customer-info">
+                  <div class="customer-name">{{ order.name }}</div>
+                  <div class="customer-email">{{ order.email }}</div>
+                </div>
+              </div>
+
+              <!-- Items -->
+              <div class="table-cell cell-items">
+                <span class="items-count">{{ getItemsCount(order) }} items</span>
+              </div>
+
+              <!-- Total -->
+              <div class="table-cell cell-total">
+                <span class="total-amount">₹{{ order.total | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Status -->
+              <div class="table-cell cell-status">
+                <span class="status-badge" [class]="'status-' + getOrderStatus(order).toLowerCase()">
+                  <span class="status-icon material-symbols-outlined" aria-hidden="true">{{ getStatusIcon(order) }}</span>
+                  <span>{{ getOrderStatus(order) }}</span>
+                </span>
+              </div>
+
+              <!-- Date -->
+              <div class="table-cell cell-date">
+                <span class="order-date">{{ order.created_at | date:'MMM d, y' }}</span>
+              </div>
+
+              <!-- Actions -->
+              <div class="table-cell cell-actions">
+                <button type="button" 
+                        class="action-btn view-btn transition-all hover:scale-105 focus:ring"
+                        (click)="view(order)"
+                        [attr.aria-label]="'View details for order ' + order.id">
+                  <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                  <span class="btn-text">View</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" *ngIf="isHandset">
+          <div *ngFor="let order of filteredOrders$ | async; trackBy: trackByOrderId" 
+               class="order-card transition-all hover:shadow-lg">
+            <div class="card-header">
+              <div class="card-title-section">
+                <span class="order-id-badge">ORD-{{ order.id.toString().padStart(3, '0') }}</span>
+                <span class="status-badge mobile-status" [class]="'status-' + getOrderStatus(order).toLowerCase()">
+                  {{ getOrderStatus(order) }}
+                </span>
+              </div>
+              <div class="card-date">{{ order.created_at | date:'MMM d' }}</div>
+            </div>
+
+            <div class="card-content">
+              <div class="customer-section">
+                <h3 class="customer-name">{{ order.name }}</h3>
+                <p class="customer-contact">{{ order.email }}</p>
+              </div>
+
+              <div class="order-details">
+                <div class="detail-item">
+                  <span class="detail-label">Items:</span>
+                  <span class="detail-value">{{ getItemsCount(order) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Total:</span>
+                  <span class="detail-value total-amount">₹{{ order.total | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button type="button" 
+                      class="action-btn view-btn-mobile transition-all hover:shadow-md focus:ring"
+                      (click)="view(order)"
+                      [attr.aria-label]="'View details for order ' + order.id">
+                <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                <span>View Details</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="(filteredOrders$ | async)?.length === 0" class="empty-state">
+        <div class="empty-state-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+        <h3 class="empty-state-title">No orders found</h3>
+        <p class="empty-state-description">There are no orders matching your current filters.</p>
+        <button type="button" 
+                class="empty-state-action transition-all hover:shadow-lg focus:ring"
+                (click)="clearAllFilters()"
+                aria-label="Clear all filters to show all orders">
+          <span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span>
+          <span>Clear Filters</span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>

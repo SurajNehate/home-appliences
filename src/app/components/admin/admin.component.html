@@ -1,14 +1,5 @@
 <div class="wrap">
   <mat-card>
-    <div class="admin-header">
-      <mat-form-field appearance="outline">
-        <mat-label>Admin section</mat-label>
-        <mat-select [value]="selected" (valueChange)="onChange($event)">
-          <mat-option *ngFor="let s of sections" [value]="s.value">{{ s.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
     <router-outlet />
   </mat-card>
 </div>

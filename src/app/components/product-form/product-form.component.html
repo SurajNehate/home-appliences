@@ -3,11 +3,15 @@
     <mat-form-field appearance="outline" class="field">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" required>
+      <mat-error *ngIf="productForm.get('name')?.hasError('required') && productForm.get('name')?.touched">Name is required</mat-error>
+      <mat-error *ngIf="productForm.get('name')?.hasError('minlength') && productForm.get('name')?.touched">Minimum 3 characters</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field">
       <mat-label>Price</mat-label>
       <input matInput type="number" formControlName="price" required>
+      <mat-error *ngIf="productForm.get('price')?.hasError('required') && productForm.get('price')?.touched">Price is required</mat-error>
+      <mat-error *ngIf="productForm.get('price')?.hasError('min') && productForm.get('price')?.touched">Must be a positive number</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field">
@@ -15,12 +19,15 @@
       <mat-select formControlName="category" required>
         <mat-option *ngFor="let c of categories" [value]="c">{{ c }}</mat-option>
       </mat-select>
+      <mat-error *ngIf="productForm.get('category')?.hasError('required') && productForm.get('category')?.touched">Category is required</mat-error>
     </mat-form-field>
   </div>
 
   <mat-form-field appearance="outline" class="field full">
     <mat-label>Description</mat-label>
     <textarea matInput rows="4" formControlName="description"></textarea>
+    <mat-error *ngIf="productForm.get('description')?.hasError('required') && productForm.get('description')?.touched">Description is required</mat-error>
+    <mat-error *ngIf="productForm.get('description')?.hasError('minlength') && productForm.get('description')?.touched">Minimum 10 characters</mat-error>
   </mat-form-field>
 
   <mat-slide-toggle formControlName="status">Active</mat-slide-toggle>

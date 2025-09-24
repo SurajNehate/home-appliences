@@ -1,43 +1,96 @@
 <div class="wrap">
-  <mat-card>
-    <div class="header">
-      <h2>Products</h2>
-      <a mat-flat-button color="primary" [routerLink]="['/products/add']">
+  <header class="admin-header section">
+    <div class="left">
+      <h1 class="h1">Catalog</h1>
+      <p class="h2">Manage products in your store.</p>
+    </div>
+    <div class="right">
+      <a mat-flat-button color="primary" [routerLink]="['/products/add']" aria-label="Create product">
         <span class="material-symbols-outlined">add_circle</span>&nbsp;New Product
       </a>
     </div>
+  </header>
 
-    <table mat-table [dataSource]="(products$ | async) || []" class="mat-elevation-z1">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let p"> {{ p.id }} </td>
+  <section class="controls section">
+    <div class="controls-grid">
+      <mat-form-field appearance="outline" class="search">
+        <span matPrefix class="material-symbols-outlined">search</span>
+        <input matInput placeholder="Search products or categories..." [formControl]="fcSearch" />
+        <button mat-icon-button matSuffix *ngIf="fcSearch.value" (click)="fcSearch.setValue('')" aria-label="Clear">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="category">
+        <mat-label>Category</mat-label>
+        <mat-select [formControl]="fcCategory">
+          <mat-option value="all">All</mat-option>
+          <mat-option *ngFor="let c of (categories$ | async)" [value]="c">{{ c }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </section>
+
+  <section class="table-wrap section" *ngIf="filtered$ | async as rows; else loadingTpl">
+    <table mat-table [dataSource]="rows" class="mat-elevation-z1" role="table" aria-label="Catalog table">
+      <!-- Product cell with thumbnail + name + excerpt -->
+      <ng-container matColumnDef="product">
+        <th mat-header-cell *matHeaderCellDef> Product </th>
+        <td mat-cell *matCellDef="let p">
+          <div class="prod">
+            <img [src]="p.imageUrl || 'https://picsum.photos/seed/' + p.id + '/80/80'" alt="{{ p.name }}"/>
+            <div class="meta">
+              <div class="name">{{ p.name }}</div>
+              <div class="desc text-muted">{{ p.description }}</div>
+            </div>
+          </div>
+        </td>
       </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let p"> {{ p.name }} </td>
+
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Category </th>
+        <td mat-cell *matCellDef="let p">
+          <span class="chip">{{ p.category }}</span>
+        </td>
       </ng-container>
+
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef> Price </th>
         <td mat-cell *matCellDef="let p"> ₹ {{ p.price | number:'1.0-2' }} </td>
       </ng-container>
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef> Category </th>
-        <td mat-cell *matCellDef="let p"> {{ p.category }} </td>
-      </ng-container>
+
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef> Status </th>
-        <td mat-cell *matCellDef="let p"> {{ p.status ? 'Active' : 'Inactive' }} </td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let p">
-          <a mat-button [routerLink]="['/products/edit', p.id]"><span class="material-symbols-outlined">edit</span>&nbsp;Edit</a>
-          <button mat-button color="warn" (click)="delete(p.id)"><span class="material-symbols-outlined">delete</span>&nbsp;Delete</button>
+          <span class="status" [class.inactive]="!p.status">{{ p.status ? 'active' : 'inactive' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef> Created </th>
+        <td mat-cell *matCellDef="let p"> {{ p.created_at | date:'dd/MM/yyyy' }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let p" class="actions">
+          <button mat-icon-button color="primary" [routerLink]="['/products/edit', p.id]" aria-label="Edit">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button mat-icon-button color="warn" (click)="delete(p.id)" aria-label="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row"></tr>
     </table>
-  </mat-card>
+  </section>
+
+  <ng-template #loadingTpl>
+    <div class="section">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  </ng-template>
 </div>

@@ -3,10 +3,14 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-export const adminGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  if (auth.isAdmin()) return true;
-  // Prefer returning a UrlTree over imperative navigation to avoid navigation races
+  
+  if (auth.isLoggedIn()) {
+    return true;
+  }
+  
+  // Redirect to login if not authenticated (return UrlTree to avoid side effects)
   return router.createUrlTree(['/admin-login']);
 };

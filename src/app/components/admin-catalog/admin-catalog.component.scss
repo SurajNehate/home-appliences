@@ -1,3 +1,29 @@
- .wrap { display: grid; gap: 1rem; }
- .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
- table { width: 100%; }
+.wrap { display: grid; gap: 12px; }
+
+.admin-header { display: flex; justify-content: space-between; align-items: flex-end; }
+.admin-header .left { display: grid; gap: 4px; }
+.admin-header .right { display: flex; align-items: center; gap: 8px; }
+
+.controls { }
+.controls .controls-grid { display: grid; grid-template-columns: 1fr minmax(180px, 220px); gap: 12px; max-width: 720px; }
+.controls .search { width: 100%; }
+.controls .category { min-width: 160px; }
+
+.table-wrap { width: 100%; overflow-x: auto; }
+.table-wrap table { width: 100%; border-radius: var(--radius); }
+
+/* Table looks */
+th.mat-header-cell { position: sticky; top: 0; background: var(--card); z-index: 1; }
+tr.row:hover { background: color-mix(in oklab, var(--primary) 6%, transparent); }
+
+/* Product cell layout */
+.prod { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; }
+.prod img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: var(--color-black); }
+.prod .name { font-weight: 600; }
+.prod .desc { font-size: 0.85rem; }
+
+.chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--secondary); color: var(--secondary-foreground); border: 1px solid var(--border); font-size: 12px; }
+.status { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #16a34a; color: white; font-size: 12px; }
+.status.inactive { background: #ef4444; }
+
+.actions { display: inline-flex; gap: 4px; }

@@ -1,19 +1,128 @@
 @use '@angular/material' as mat;
 
-/* Minimal Material 3 theme using Angular Material v19 API */
+/* Material 3 themes using system CSS variables */
 $light-theme: mat.define-theme((
-  color: (theme-type: light),
+  color: (
+    theme-type: light,
+    use-system-variables: true,
+    system-variables-prefix: 'mat',
+  ),
+  density: (scale: 0),
 ));
 
 $dark-theme: mat.define-theme((
-  color: (theme-type: dark),
+  color: (
+    theme-type: dark,
+    use-system-variables: true,
+    system-variables-prefix: 'mat',
+  ),
+  density: (scale: 0),
 ));
 
-:root { @include mat.all-component-themes($light-theme); }
+/* Design tokens derived from the reference app (localhost:3000) */
+:root,
+.theme-light {
+  /* Core UI tokens */
+  --font-size: 16px;
+  --background: #fff;
+  --foreground: #1e293b;
+  --card: #fff;
+  --card-foreground: #1e293b;
+  --popover: #fff;
+  --popover-foreground: #1e293b;
+  --primary: #6366f1;
+  --primary-foreground: #fff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #475569;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #ec4899;
+  --accent-foreground: #fff;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+  --border: #0000001a;
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: oklch(.708 0 0);
+  --radius: .625rem;
+  --color-black: #000;
+  --color-white: #fff;
 
-/* Optional manual toggle for dark mode: add `theme-dark` class on <body> or <html> */
+  /* Map Material system variables to our tokens */
+  --mat-sys-primary: var(--primary);
+  --mat-sys-on-primary: var(--primary-foreground);
+  --mat-sys-secondary: var(--secondary);
+  --mat-sys-on-secondary: var(--secondary-foreground);
+  --mat-sys-surface: var(--card);
+  --mat-sys-on-surface: var(--foreground);
+  --mat-sys-error: var(--destructive);
+  --mat-sys-on-error: var(--destructive-foreground);
+
+  /* Sidebar tokens (not heavily used yet, kept for parity) */
+  --sidebar: oklch(.985 0 0);
+  --sidebar-foreground: oklch(.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(.985 0 0);
+  --sidebar-accent: oklch(.97 0 0);
+  --sidebar-accent-foreground: oklch(.205 0 0);
+  --sidebar-border: oklch(.922 0 0);
+  --sidebar-ring: oklch(.708 0 0);
+}
+
+.theme-dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  --primary: #818cf8;
+  --primary-foreground: #1e293b;
+  --secondary: #334155;
+  --secondary-foreground: #f1f5f9;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #f472b6;
+  --accent-foreground: #1e293b;
+  --destructive: #f87171;
+  --destructive-foreground: #1e293b;
+  --border: oklch(.269 0 0);
+  --input: oklch(.269 0 0);
+  --ring: oklch(.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --color-black: #000;
+  --color-white: #fff;
+
+  /* Map Material system variables to our tokens (dark) */
+  --mat-sys-primary: var(--primary);
+  --mat-sys-on-primary: var(--primary-foreground);
+  --mat-sys-secondary: var(--secondary);
+  --mat-sys-on-secondary: var(--secondary-foreground);
+  --mat-sys-surface: var(--card);
+  --mat-sys-on-surface: var(--card-foreground);
+  --mat-sys-error: var(--destructive);
+  --mat-sys-on-error: var(--destructive-foreground);
+
+  /* Sidebar (dark) */
+  --sidebar: oklch(.205 0 0);
+  --sidebar-foreground: oklch(.985 0 0);
+  --sidebar-primary: oklch(.488 .243 264.376);
+  --sidebar-primary-foreground: oklch(.985 0 0);
+  --sidebar-accent: oklch(.269 0 0);
+  --sidebar-accent-foreground: oklch(.985 0 0);
+  --sidebar-border: oklch(.269 0 0);
+  --sidebar-ring: oklch(.439 0 0);
+}
+
+/* Apply Angular Material themes */
+:root,
+.theme-light { @include mat.all-component-themes($light-theme); }
 .theme-dark  { @include mat.all-component-colors($dark-theme); }
 
-/* Utilities */
+/* Global utilities */
 .w-100 { width: 100%; }
 .sim-pointer { cursor: pointer; }

@@ -32,7 +32,7 @@ export class SignupComponent {
     const { name, email, password } = this.form.value as any;
     this.error = '';
     this.auth.signupMember(name, email, password).subscribe({
-      next: () => this.router.navigate(['/products']),
+      next: () => this.router.navigate(['/']), // Members go to home page after signup
       error: (e) => this.error = e?.error?.error || 'SIGNUP_FAILED'
     });
   }

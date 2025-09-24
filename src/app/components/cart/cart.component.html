@@ -1,100 +1,184 @@
-<div class="wrap" *ngIf="items$ | async as items">
-  <mat-card>
-    <h2 class="title">Your Cart</h2>
-
-    <!-- Desktop/Tablet: table layout -->
-    <div *ngIf="!isHandset; else mobileList">
-      <div class="table-container">
-        <table mat-table [dataSource]="items" class="mat-elevation-z1">
-          <!-- Image -->
-          <ng-container matColumnDef="image">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let item">
-              <img [src]="item.imageUrl || 'https://picsum.photos/seed/' + item.id + '/100/100'" [alt]="item.name">
-            </td>
-          </ng-container>
-
-          <!-- Name -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef> Product </th>
-            <td mat-cell *matCellDef="let item"> {{item.name}} </td>
-          </ng-container>
-
-          <!-- Price -->
-          <ng-container matColumnDef="price">
-            <th mat-header-cell *matHeaderCellDef> Price </th>
-            <td mat-cell *matCellDef="let item"> ₹ {{item.price | number:'1.0-2'}} </td>
-          </ng-container>
-
-          <!-- Qty -->
-          <ng-container matColumnDef="qty">
-            <th mat-header-cell *matHeaderCellDef> Qty </th>
-            <td mat-cell *matCellDef="let item">
-              <button mat-icon-button (click)="dec(item.id)"><span class="material-symbols-outlined">remove</span></button>
-              <span class="qty">{{item.qty}}</span>
-              <button mat-icon-button (click)="inc(item.id)"><span class="material-symbols-outlined">add</span></button>
-            </td>
-          </ng-container>
-
-          <!-- Total -->
-          <ng-container matColumnDef="total">
-            <th mat-header-cell *matHeaderCellDef> Total </th>
-            <td mat-cell *matCellDef="let item"> ₹ {{(item.price * item.qty) | number:'1.0-2'}} </td>
-          </ng-container>
-
-          <!-- Actions -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let item">
-              <button mat-button color="warn" (click)="remove(item.id)">
-                <span class="material-symbols-outlined">delete</span>&nbsp;Remove
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+<!-- Empty Cart State -->
+<div *ngIf="(items$ | async) as items; else loadingState" class="cart-container">
+  <div *ngIf="items.length === 0; else cartWithItems" class="empty-cart" role="main" aria-label="Empty cart">
+    <div class="empty-cart-content">
+      <div class="empty-cart-icon" aria-hidden="true">
+        <span class="material-symbols-outlined">shopping_cart</span>
       </div>
+      <h1 class="empty-cart-title">Your cart is empty</h1>
+      <p class="empty-cart-description">Looks like you haven't added anything to your cart yet.</p>
+      <a [routerLink]="['/']" 
+         class="continue-shopping-btn transition-all hover:shadow-lg focus:ring"
+         aria-label="Continue shopping and browse products">
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        <span>Continue Shopping</span>
+      </a>
     </div>
+  </div>
 
-    <!-- Mobile: card list layout -->
-    <ng-template #mobileList>
-      <div class="mobile-list">
-        <div class="item-card" *ngFor="let item of items; trackBy: trackById">
-          <div class="img">
-            <img [src]="item.imageUrl || 'https://picsum.photos/seed/' + item.id + '/100/100'" [alt]="item.name">
-          </div>
-          <div class="info">
-            <div class="name">{{ item.name }}</div>
-            <div class="price">₹ {{ item.price | number:'1.0-2' }}</div>
-          </div>
-          <div class="qty">
-            <button mat-mini-fab color="primary" (click)="dec(item.id)"><span class="material-symbols-outlined">remove</span></button>
-            <span class="val">{{ item.qty }}</span>
-            <button mat-mini-fab color="primary" (click)="inc(item.id)"><span class="material-symbols-outlined">add</span></button>
-          </div>
-          <div class="total">₹ {{ (item.price * item.qty) | number:'1.0-2' }}</div>
-          <div class="actions">
-            <button mat-stroked-button color="warn" (click)="remove(item.id)">
-              <span class="material-symbols-outlined">delete</span>&nbsp;Remove
-            </button>
-          </div>
+  <!-- Cart with Items -->
+  <ng-template #cartWithItems>
+    <main class="cart-main" role="main">
+      <div class="cart-header">
+        <div class="cart-title-section">
+          <h1 class="cart-title">Shopping Cart ({{ items.length }} items)</h1>
         </div>
+        <button type="button" 
+                class="clear-cart-btn transition-colors hover:opacity-80 focus:ring"
+                (click)="clear()" 
+                [disabled]="items.length === 0"
+                [attr.aria-label]="'Clear all ' + items.length + ' items from cart'">
+          Clear Cart
+        </button>
       </div>
-    </ng-template>
 
-    <div class="footer">
-      <div class="left">
-        <a mat-stroked-button color="primary" [routerLink]="['/products']">
-          <span class="material-symbols-outlined">arrow_back</span>&nbsp;Continue Shopping
-        </a>
+      <div class="cart-content">
+        <!-- Cart Items Section -->
+        <section class="cart-items-section" aria-label="Shopping cart items">
+          <!-- Desktop Table Header -->
+          <div class="table-header" *ngIf="!isHandset" role="row" aria-label="Table header">
+            <div class="header-product" role="columnheader">Product</div>
+            <div class="header-price" role="columnheader">Price</div>
+            <div class="header-quantity" role="columnheader">Quantity</div>
+            <div class="header-total" role="columnheader">Total</div>
+            <div class="header-actions" role="columnheader" aria-label="Actions"></div>
+          </div>
+
+          <!-- Cart Items List -->
+          <div class="cart-items-list" role="list" [attr.aria-label]="'Shopping cart with ' + items.length + ' items'">
+            <div *ngFor="let item of items; trackBy: trackById; let i = index" 
+                 class="cart-item transition-all hover:shadow-md"
+                 role="listitem"
+                 [attr.aria-label]="item.name + ', quantity ' + item.qty + ', total ' + (item.price * item.qty | currency:'INR':'symbol':'1.2-2')">
+              
+              <!-- Product Info -->
+              <div class="item-product">
+                <div class="item-image-container">
+                  <img [src]="item.imageUrl || 'https://picsum.photos/seed/' + item.id + '/200/200'" 
+                       [alt]="item.name"
+                       class="item-image"
+                       loading="lazy" />
+                </div>
+                <div class="item-details">
+                  <h3 class="item-name">{{ item.name }}</h3>
+                  <p class="item-category" *ngIf="item.category">{{ item.category }}</p>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="item-price">
+                <span class="price-label" *ngIf="isHandset">Price:</span>
+                <span class="price-value" [attr.aria-label]="'Price: ' + (item.price | currency:'INR':'symbol':'1.2-2')">
+                  ₹{{ item.price | number:'1.2-2' }}
+                </span>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="item-quantity">
+                <span class="quantity-label" *ngIf="isHandset">Quantity:</span>
+                <div class="quantity-controls" role="group" [attr.aria-label]="'Quantity controls for ' + item.name">
+                  <button type="button" 
+                          class="quantity-btn quantity-btn--decrease transition-all hover:bg-gray-100 focus:ring"
+                          (click)="dec(item.id)"
+                          [disabled]="item.qty <= 1"
+                          [attr.aria-label]="'Decrease quantity of ' + item.name">
+                    <span class="material-symbols-outlined" aria-hidden="true">remove</span>
+                  </button>
+                  <input type="number" 
+                         class="quantity-input focus:ring"
+                         [value]="item.qty"
+                         (change)="updateQuantity(item.id, $event)"
+                         min="1"
+                         max="99"
+                         [attr.aria-label]="'Quantity of ' + item.name"
+                         readonly />
+                  <button type="button" 
+                          class="quantity-btn quantity-btn--increase transition-all hover:bg-gray-100 focus:ring"
+                          (click)="inc(item.id)"
+                          [disabled]="item.qty >= 99"
+                          [attr.aria-label]="'Increase quantity of ' + item.name">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Total -->
+              <div class="item-total">
+                <span class="total-label" *ngIf="isHandset">Total:</span>
+                <span class="total-value" [attr.aria-label]="'Total: ' + (item.price * item.qty | currency:'INR':'symbol':'1.2-2')">
+                  ₹{{ (item.price * item.qty) | number:'1.2-2' }}
+                </span>
+              </div>
+
+              <!-- Remove Action -->
+              <div class="item-actions">
+                <button type="button" 
+                        class="remove-btn transition-all hover:scale-105 focus:ring"
+                        (click)="remove(item.id)"
+                        [attr.aria-label]="'Remove ' + item.name + ' from cart'">
+                  <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Order Summary Section -->
+        <aside class="order-summary" role="complementary" aria-label="Order summary">
+          <div class="order-summary-content">
+            <h2 class="order-summary-title">Order Summary</h2>
+            
+            <div class="order-details">
+              <div class="order-line">
+                <span class="order-label">Subtotal ({{ getTotalItems(items) }} items):</span>
+                <span class="order-value">₹{{ cart.total | number:'1.2-2' }}</span>
+              </div>
+              <div class="order-line">
+                <span class="order-label">Shipping:</span>
+                <span class="order-value shipping-free">Free</span>
+              </div>
+              <div class="order-line">
+                <span class="order-label">Tax:</span>
+                <span class="order-value">₹{{ (cart.total * 0.08) | number:'1.2-2' }}</span>
+              </div>
+              <hr class="order-divider" role="separator" />
+              <div class="order-line order-total">
+                <span class="order-label">Total:</span>
+                <span class="order-value total-amount" [attr.aria-label]="'Total amount: ' + ((cart.total * 1.08) | currency:'INR':'symbol':'1.2-2')">
+                  ₹{{ (cart.total * 1.08) | number:'1.2-2' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="order-actions">
+              <a [routerLink]="['/checkout-guest']" 
+                 class="checkout-btn transition-all hover:shadow-lg focus:ring"
+                 [class.disabled]="items.length === 0" 
+                 [attr.aria-disabled]="items.length === 0"
+                 [attr.aria-label]="'Proceed to checkout with total of ' + ((cart.total * 1.08) | currency:'INR':'symbol':'1.2-2')">
+                <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span>
+                <span>Proceed to Checkout</span>
+              </a>
+              
+              <a [routerLink]="['/']" 
+                 class="continue-shopping-link transition-colors hover:opacity-80 focus:ring"
+                 aria-label="Continue shopping">
+                Continue Shopping
+              </a>
+            </div>
+          </div>
+        </aside>
       </div>
-      <div class="right">
-        <div class="sum">Subtotal: <strong>₹ {{ cart.total | number:'1.0-2' }}</strong></div>
-        <a mat-flat-button color="primary" [routerLink]="['/checkout-guest']" [class.mat-disabled]="items.length === 0" [attr.aria-disabled]="items.length === 0">Checkout</a>
-        <button mat-button color="warn" (click)="clear()" [disabled]="items.length === 0">Clear</button>
-      </div>
-    </div>
-  </mat-card>
+    </main>
+  </ng-template>
 </div>
+
+<!-- Loading State -->
+<ng-template #loadingState>
+  <div class="loading-state" role="status" aria-label="Loading cart">
+    <div class="loading-spinner" aria-hidden="true">
+      <span class="material-symbols-outlined">refresh</span>
+    </div>
+    <p class="loading-text">Loading your cart...</p>
+  </div>
+</ng-template>
